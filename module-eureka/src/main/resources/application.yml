@@ -1,0 +1,11 @@
+server:
+  port: 8761
+
+spring:
+  application:
+    name: module-eureka
+
+eureka:
+  client:
+    register-with-eureka: false #eureka server를 registry에 등록할지 여부
+    fetch-registry: false       #registry에 있는 정보들을 가져올지 여부

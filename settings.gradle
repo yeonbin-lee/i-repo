@@ -1,0 +1,9 @@
+rootProject.name = 'multi-module'
+include 'module-common'
+include 'module-core'
+include 'module-backoff'
+include 'module-notification'
+include 'module-eureka'
+include 'module-common'
+include 'aaa'
+
