@@ -6,4 +6,5 @@ include 'module-notification'
 include 'module-eureka'
 include 'module-common'
 include 'aaa'
+include 'apigateway'
 

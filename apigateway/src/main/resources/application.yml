@@ -1,0 +1,38 @@
+server:
+  port: 9000
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defalutZone: http://localhost:8761/eureka
+
+spring:
+  application:
+    name: apigateway-service
+  cloud:
+    gateway:
+      routes:
+        - id: module-common
+          uri: lb://MODULE-COMMON
+          predicates:
+            - Path=/module-common/**
+        - id: module-backoff
+          uri: lb://MODULE-BACKOFF
+          predicates:
+            - Path=/module-backoff/**
+        - id: module-core
+          uri: lb://MODULE-CORE
+          predicates:
+            - Path=/module-core/**
+        - id: module-notification
+          uri: lb://MODULE-NOTIFICATION
+          predicates:
+            - Path=/module-notification/**
+
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: health, info, metrics, prometheus, gateway
