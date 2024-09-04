@@ -1,38 +1,48 @@
 server:
   port: 9000
-
 eureka:
   client:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defalutZone: http://localhost:8761/eureka
+      defaultZone: http://localhost:8761/eureka
 
 spring:
+  jwt:
+    secret: secretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkeysecretkey
+  main:
+    web-application-type: reactive
   application:
-    name: apigateway-service
+    name: apigateway-server
   cloud:
     gateway:
+      default-filters:
+        - name: AuthenticationFilter
       routes:
         - id: module-common
           uri: lb://MODULE-COMMON
           predicates:
             - Path=/module-common/**
-        - id: module-backoff
-          uri: lb://MODULE-BACKOFF
-          predicates:
-            - Path=/module-backoff/**
-        - id: module-core
-          uri: lb://MODULE-CORE
-          predicates:
-            - Path=/module-core/**
-        - id: module-notification
-          uri: lb://MODULE-NOTIFICATION
-          predicates:
-            - Path=/module-notification/**
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/module-common/(?<segment>.*), /$\{segment}
 
-#management:
-#  endpoints:
-#    web:
-#      exposure:
-#        include: health, info, metrics, prometheus, gateway
+#        - id: module-common
+#          uri: lb://MODULE-COMMON
+#          predicates:
+#            - Path=/module-common/auth/**
+#            - Method=POST
+#          filters:
+#            - RemoveRequestHeader=Cookie
+#            - RewritePath=/module-common/(?<segment>.*), /$\{segment}
+#
+#        - id: module-common
+#          uri: lb://MODULE-COMMON
+#          predicates:
+#            - Path=/module-common/user/**
+#          filters:
+#            - RemoveRequestHeader=Cookie
+#            - RewritePath=/module-common/(?<segment>.*), /$\{segment}
+#            - AuthorizationHeaderFilter
+
+
