@@ -1,9 +1,5 @@
 HELP.md
-/apigateway/src/main/resources/application.yml
-/module-backoff/src/main/resources/application.yml
-/module-common/src/main/resources/application.yml
-/module-core/src/main/resources/application.yml
-/module-notification/src/main/resources/application.yml
+
 
 .gradle
 build/
@@ -41,3 +37,11 @@ out/
 
 ### VS Code ###
 .vscode/
+
+
+/apigateway/src/main/resources/application.yml
+/module-common/src/main/resources/application.yml
+/module-backoff/src/main/resources/application.yml
+/module-core/src/main/resources/application.yml
+/module-eureka/src/main/resources/application.yml
+/module-notification/src/main/resources/application.yml
