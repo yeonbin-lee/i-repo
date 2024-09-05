@@ -1,4 +1,4 @@
-package com.example.domain.member.controller.dto.request.member;
+package com.example.domain.auth.controller.dto.request;
 
 import jakarta.validation.constraints.Email;
 import lombok.Getter;

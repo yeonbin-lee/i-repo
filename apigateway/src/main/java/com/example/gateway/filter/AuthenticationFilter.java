@@ -53,9 +53,15 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 
                     try {
                         jwtUtil.validateToken(token);
+
+                        // 로그아웃 체크
+                        if (jwtUtil.isTokenLogout(token)) {
+                            throw new UnauthorizedAccessException();
+                        }
                     } catch (Exception e) {
                         throw new UnauthorizedAccessException();
                     }
+
                 } else {
                     throw new InvalidAuthorizationHeaderFormatException();
                 }

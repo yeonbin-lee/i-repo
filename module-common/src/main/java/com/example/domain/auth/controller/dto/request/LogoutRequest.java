@@ -11,6 +11,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class LogoutRequest {
     private String email;
-    private String accessToken;
+//    private String accessToken;
 //    private String refreshToken;
 }

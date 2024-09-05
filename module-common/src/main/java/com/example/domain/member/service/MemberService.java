@@ -1,20 +1,23 @@
 package com.example.domain.member.service;
 
-import com.example.domain.member.controller.dto.request.member.FindEmailByPhoneRequest;
 import com.example.domain.member.controller.dto.request.member.NicknameChangeRequest;
 import com.example.domain.member.controller.dto.request.member.PwChangeRequest;
-import com.example.domain.member.controller.dto.request.member.PwFindRequest;
 import com.example.domain.member.controller.dto.response.MemberResponse;
+import com.example.domain.member.entity.Member;
 
 public interface MemberService {
 
     public MemberResponse findById(String accessToken);
-    //    public void update(Long id, MemberUpdateDTO requestDto);
-//    public void delete(String accessToken);
-//    public boolean checkDuplicateEmail(String email);
-//    public String findEmailByPhone(FindEmailByPhoneRequest findEmailByPhoneRequest);
-//    public void changePasswordV1(PwFindRequest pwFindRequest);
-//    public void changePasswordV2(String accessToken, PwChangeRequest pwChangeRequest);
-//    public void changeNickname(String accessToken, NicknameChangeRequest nicknameChangeRequest);
+//    public void update(Long id, MemberUpdateDTO requestDto);
+    public void delete(String accessToken);
+    public Boolean existByEmail(String email);
+    public Boolean existByPhone(String phone);
+    public Boolean existByNickname(String nickname);
+    public void saveMember(Member member);
+    public Member findByPhone(String phone);
+    public Member findByEmail(String email);
+    public void changePassword(String accessToken, PwChangeRequest request);
+
+    public void changeNickname(String accessToken, NicknameChangeRequest request);
 
 }

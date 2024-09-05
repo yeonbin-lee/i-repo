@@ -1,4 +1,4 @@
-package com.example.domain.member.controller.dto.request.member;
+package com.example.domain.auth.controller.dto.request;
 
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -13,7 +13,7 @@ import lombok.Setter;
 public class FindEmailByPhoneRequest {
 
     @Pattern(regexp = "^\\d{2,3}-\\d{3,4}-\\d{4}$", message = "전화번호 형식이 올바르지 않습니다.")
-    private String phoneNum;
+    private String phone;
 
     private String code;
 
