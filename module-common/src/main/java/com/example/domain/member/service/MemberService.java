@@ -17,7 +17,6 @@ public interface MemberService {
     public Member findByPhone(String phone);
     public Member findByEmail(String email);
     public void changePassword(String accessToken, PwChangeRequest request);
-
     public void changeNickname(String accessToken, NicknameChangeRequest request);
 
 }

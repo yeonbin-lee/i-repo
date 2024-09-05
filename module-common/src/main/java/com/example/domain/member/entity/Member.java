@@ -49,6 +49,9 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Provider provider;
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<Profile> profiles = new ArrayList<Profile>();
+
 //    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
 //    private List<MemberTerm> memberTerms;
 
