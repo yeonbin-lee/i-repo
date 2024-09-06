@@ -22,6 +22,7 @@ public class KakaoInfo
         private String gender;
         private String birthyear;
         private String birthday;
+        private String phone_number;
 
         @NoArgsConstructor
         @AllArgsConstructor

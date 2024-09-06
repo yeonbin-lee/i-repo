@@ -16,7 +16,6 @@ import com.example.domain.member.service.MemberService;
 import com.example.global.config.jwt.CustomUserDetails;
 import com.example.global.config.jwt.JwtTokenProvider;
 import com.example.global.config.jwt.RefreshToken;
-import com.example.global.config.jwt.RefreshTokenRepository;
 import com.example.global.exception.custom.NotEqualsCodeException;
 import com.example.global.exception.custom.SocialLoginException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -59,6 +59,7 @@ public class AuthServiceImpl implements AuthService {
     private final RefreshTokenService refreshTokenService;
     private final KakaoClient kakaoClient;
     private final LogoutService logoutService;
+    private final RedisTemplate<String, Object> redisTemplate;
 
 
     /** [일반] 이메일 회원가입 API
@@ -82,25 +83,27 @@ public class AuthServiceImpl implements AuthService {
             throw new DataIntegrityViolationException("중복되는 닉네임입니다.");
         }
 
-        Sms sms = smsService.findSmsByPhone(request.getPhone());
-
-        if (request.getCode().equals(sms.getCode())) {
-            Member member = Member.builder()
-                    .email(request.getEmail())
-                    .nickname(request.getNickname())
-                    .phone(request.getPhone())
-                    .gender(request.getGender())
-                    .password(passwordEncoder.encode(request.getPassword()))
-                    .birthday(request.getBirthday())
-                    .role(Role.ROLE_USER)
-                    .provider(Provider.NORMAL)
-                    .build();
-
-            // SAVE MEMBER ENTITY
-            memberService.saveMember(member);
-        } else {
-            throw new NotEqualsCodeException("잘못된 요청입니다.");
+        // 인증되지않은 전화번호
+        if(!isTokenPhone(request.getPhone())){
+            throw new DataIntegrityViolationException("잘못된 요청입니다.");
         }
+
+        // 회원가입 후 Redis에 저장된 전화번호 인증 정보를 삭제
+        deletePhoneNumberVerification(request.getPhone());
+
+        Member member = Member.builder()
+                .email(request.getEmail())
+                .nickname(request.getNickname())
+                .phone(request.getPhone())
+                .gender(request.getGender())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .birthday(request.getBirthday())
+                .role(Role.ROLE_USER)
+                .provider(Provider.NORMAL)
+                .build();
+
+        // SAVE MEMBER ENTITY
+        memberService.saveMember(member);
     }
 
     /** 이메일 중복체크 */
@@ -337,13 +340,15 @@ public class AuthServiceImpl implements AuthService {
         String birthyear = memberInfo.getKakaoAccount().getBirthyear();
         // 월일
         String birthday = memberInfo.getKakaoAccount().getBirthday();
+        String phone = memberInfo.getKakaoAccount().getPhone_number();
+        System.out.println("받아온 Phone정보=" + phone);
 
         // LocalDate 타입 변환 형식 지정 (yyyy-mm-dd)
         String birth_str = birthyear + "-" + birthday.substring(0,2) + "-" + birthday.substring(2,4);
         LocalDate birth = LocalDate.parse(birth_str, DateTimeFormatter.ISO_DATE);
 
         String password = socialRandomPassword(email);
-        Member member = new Member(nickname, email, password, "", Gender.valueOf(gender.toUpperCase()), birth, Role.ROLE_USER, Provider.KAKAO);
+        Member member = new Member(nickname, email, password, phone, Gender.valueOf(gender.toUpperCase()), birth, Role.ROLE_USER, Provider.KAKAO);
         return member;
     }
 
@@ -370,4 +375,23 @@ public class AuthServiceImpl implements AuthService {
         String systemMil = String.valueOf(System.currentTimeMillis());
         return passwordEncoder.encode(email + systemMil);
     }
+
+    /**
+     * redis에 인증된 전화번호인지 체크
+     * */
+    public boolean isTokenPhone(String phone) {
+        // Redis에 해당 번호가 존재하는지 확인
+        return Boolean.TRUE.equals(redisTemplate.hasKey(getRedisKeyForToken(phone)));
+    }
+    private String getRedisKeyForToken(String token) {
+        return "verified_phone:" + token;
+    }
+
+    // 회원가입 후 Redis에 저장된 전화번호 인증 정보를 삭제
+    public void deletePhoneNumberVerification(String phone) {
+        // Redis에서 해당 전화번호와 연결된 인증 정보를 삭제
+        String key = "verified_phone:" + phone;
+        redisTemplate.delete(key);  // 해당 키를 삭제
+    }
+
 }
