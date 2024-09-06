@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 public class ProfileUpdateRequest {
 
-    private Long profile_id;
+    private Long profileId;
 
     private Choice pregnancy;
 

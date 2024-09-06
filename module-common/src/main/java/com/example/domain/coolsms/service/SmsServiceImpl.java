@@ -21,8 +21,8 @@ public class SmsServiceImpl implements SmsService {
     private final RedisTemplate<String, Object> redisTemplate;
 
     @Override // SmsService 인터페이스 메서드 구현
-    public void sendSms(SmsRequest smsRequest) {
-        String phone = smsRequest.getPhoneNum(); // SmsrequestDto에서 전화번호를 가져온다.
+    public void sendSms(SmsRequest request) {
+        String phone = request.getPhone(); // SmsrequestDto에서 전화번호를 가져온다.
 
         String certificationCode = Integer.toString((int)(Math.random() * (999999 - 100000 + 1)) + 100000); // 6자리 인증 코드를 랜덤으로 생성
         smsCertificationUtil.sendSMS(phone, String.valueOf(certificationCode)); // SMS 인증 유틸리티를 사용하여 SMS 발송
@@ -45,8 +45,8 @@ public class SmsServiceImpl implements SmsService {
 
 
     @Override // SmsService 인터페이스 메서드 구현
-    public void fakeSendSms(SmsRequest smsRequest) {
-        String phone = smsRequest.getPhoneNum(); // SmsrequestDto에서 전화번호를 가져온다.
+    public void fakeSendSms(SmsRequest request) {
+        String phone = request.getPhone(); // SmsrequestDto에서 전화번호를 가져온다.
 
         String certificationCode = Integer.toString((int)(Math.random() * (999999 - 100000 + 1)) + 100000); // 6자리 인증 코드를 랜덤으로 생성
         System.out.println("code = " + certificationCode);
@@ -67,10 +67,10 @@ public class SmsServiceImpl implements SmsService {
 
 
     @Override
-    public boolean verifySms(SmsVerifyRequest smsVerifyRequest){
-        String phone = smsVerifyRequest.getPhoneNum();
+    public boolean verifySms(SmsVerifyRequest request){
+        String phone = request.getPhone();
         Sms sms =  findSmsByPhone(phone);
-        if(sms.getCode().equals(smsVerifyRequest.getCertificationCode())){
+        if(sms.getCode().equals(request.getCertificationCode())){
             deleteByPhone(phone);
             verifyPhone(phone);
             return true;

@@ -13,7 +13,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class SmsVerifyRequest {
     @Pattern(regexp = "^\\d{2,3}-\\d{3,4}-\\d{4}$", message = "전화번호 형식이 올바르지 않습니다.")
-    private String phoneNum;
+    private String phone;
     @NotEmpty(message = "인증번호를 입력해주세요.")
     private String certificationCode;
 }

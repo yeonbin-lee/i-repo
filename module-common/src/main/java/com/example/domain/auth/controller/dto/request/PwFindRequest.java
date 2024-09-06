@@ -16,7 +16,5 @@ public class PwFindRequest {
     @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,15}$", message = "비밀번호는 8~15자 영문, 숫자, 특수문자를 사용하세요.")
     private String password;
 
-    @NotBlank
-    private String code;
 }
 

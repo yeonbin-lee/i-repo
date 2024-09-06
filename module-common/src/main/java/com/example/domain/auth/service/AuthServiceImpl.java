@@ -121,23 +121,22 @@ public class AuthServiceImpl implements AuthService {
      */
     public FindEmailResponse findEmailByPhone(FindEmailByPhoneRequest request) {
 
-        String phone = request.getPhone();
-
-        // key(phone)으로 Redis에서 Sms값 가져오기
-        Sms sms = smsService.findSmsByPhone(phone);
-
-        if (request.getCode().equals(sms.getCode())) {
-            Member member = memberService.findByPhone(phone);
-            smsService.deletePhone(phone);
-            FindEmailResponse findEmailResponse = FindEmailResponse.builder()
-                    .provider(member.getProvider())
-                    .email(member.getEmail())
-                    .build();
-
-            return findEmailResponse;
+        // 인증되지않은 전화번호
+        if(!isTokenPhone(request.getPhone())){
+            throw new DataIntegrityViolationException("잘못된 요청입니다.");
         }
-        // 인증코드가 일치하지않는 경우
-        throw new NotEqualsCodeException();
+
+        // 회원가입 후 Redis에 저장된 전화번호 인증 정보를 삭제
+        deletePhoneNumberVerification(request.getPhone());
+
+        Member member = memberService.findByPhone(request.getPhone());
+        smsService.deletePhone(request.getPhone());
+        FindEmailResponse findEmailResponse = FindEmailResponse.builder()
+                .provider(member.getProvider())
+                .email(member.getEmail())
+                .build();
+
+        return findEmailResponse;
     }
 
     // Redis 내에 Key(전화번호)가 존재하는지 확인
@@ -154,23 +153,19 @@ public class AuthServiceImpl implements AuthService {
      *  2) 인증코드를 Redis에 저장한 후, (key: 전화번호, value:인증코드) 형태로 저장
      *  3) Redis 내에 인증코드가 존재한다면 password 재설정
      * */
-    public void findPassword(PwFindRequest pwFindRequest) {
+    public void findPassword(PwFindRequest request) {
 
-        String phone = pwFindRequest.getPhone();
-        String newPassword = pwFindRequest.getPassword();
-        String code = pwFindRequest.getCode();
-
-        Sms sms = verifyRedisByPhone(phone);
-
-        if (code.equals(sms.getCode())) {
-            Member member = memberService.findByPhone(phone);
-
-            String encryptPassword = passwordEncoder.encode(newPassword);
-            member.updatePassword(encryptPassword);
-            memberService.saveMember(member);
-        } else {
-            throw new NotEqualsCodeException("잘못된 요청입니다.");
+        // 인증되지않은 전화번호
+        if(!isTokenPhone(request.getPhone())){
+            throw new DataIntegrityViolationException("잘못된 요청입니다.");
         }
+
+        // 회원가입 후 Redis에 저장된 전화번호 인증 정보를 삭제
+        deletePhoneNumberVerification(request.getPhone());
+        Member member = memberService.findByPhone(request.getPhone());
+
+        member.updatePassword(passwordEncoder.encode(request.getPassword()));
+        memberService.saveMember(member);
     }
 
 

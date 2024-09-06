@@ -22,6 +22,12 @@ public class AuthController {
 
     /**
      * [일반] 이메일 회원가입 API
+     * @param request - role "ROLE_USER"으로 고정
+     * @param request - provider 사용자가 가입한 채널, enum(NORMAL, KAKAO)
+     * @param request - email, nickname, password, phone 사용자가 입력
+     * @param request - gender 사용자가 입력한 성별, enum(MALE, FEMALE, NO_INFO)
+     * @param request - birthday 사용자가 입력한 생년월일, YYYY-mm-dd 형식 사용
+     * @return response - provider, email
      * */
     @PostMapping("/signup")
     public ResponseEntity<?> singUp(@RequestBody @Valid SignupRequest request) {
@@ -30,63 +36,36 @@ public class AuthController {
     }
 
     /**
-     * 이메일 중복체크 API
+     * [일반] 이메일 중복체크 API
+     * @param request - email
+     * @return response - boolean (true - 이메일이 이미 존재할 경우, false - 사용할 수 있는 이메일)
      * */
-    // Q. 어떤 provider를 사용하는지 알려아하는가? ex) normal, kakao
     @PostMapping("/email/duplicate")
-    public ResponseEntity<?> emailDuplicate(@RequestBody @Valid CheckEmailDuplicateRequest requestDto){
-        Boolean checkEmailDuplicate = authService.checkDuplicateEmail(requestDto.getEmail());
+    public ResponseEntity<?> emailDuplicate(@RequestBody @Valid CheckEmailDuplicateRequest request){
+        Boolean checkEmailDuplicate = authService.checkDuplicateEmail(request.getEmail());
         return ResponseEntity.status(HttpStatus.OK).body(checkEmailDuplicate);
     }
 
     /**
-     * 이메일 찾기 By 전화번호 API
-     * */
-    @PostMapping("/find/email")
-    public ResponseEntity<?> findEmailByPhone(@RequestBody @Valid FindEmailByPhoneRequest request){
-        FindEmailResponse response = authService.findEmailByPhone(request);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    /**
-     * 1. 비밀번호 재설정 API
-     *  - 비밀번호를 잊어버렸을 경우
+     * [일반] 비밀번호 재설정 API - 비밀번호를 잊어버렸을 경우
+     * @param request - phone 사용자의 전화번호
+     * @param request - password 비밀번호로 설정할 새로운 비밀번호
      * */
     @PutMapping("/find/password")
-    public ResponseEntity<?> findPassword(@RequestBody @Valid PwFindRequest pwFindRequest){
-        authService.findPassword(pwFindRequest);
+    public ResponseEntity<?> findPassword(@RequestBody @Valid PwFindRequest request){
+        authService.findPassword(request);
         return ResponseEntity.status(HttpStatus.OK).body("Password changed successfully!");
     }
 
     /**
      * [일반] 로그인 API
+     * @param request - 사용자가 입력한 email, password
+     * @return response - accessToken, refreshToken, Member 객체
      * */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequest request) {
         LoginResponse loginResponse = authService.login(request);
         return ResponseEntity.status(HttpStatus.OK).body(loginResponse);
-    }
-
-    /**
-     * Access 토큰갱신 API
-     * */
-    @GetMapping("/refresh")
-    public ResponseEntity<?> refreshToken(@RequestHeader("REFRESH_TOKEN") String refreshToken, @RequestBody RefreshRequest request) {
-        String newAccessToken = authService.refreshAccessToken(refreshToken, request);
-        return ResponseEntity.status(HttpStatus.OK).body(newAccessToken);
-    }
-
-    /**
-     * 로그아웃
-     * 1. Redis내의 refresh_token 삭제
-     * 2. Redis에 현재 access_token을 logout 상태로 등록
-     * - 2.1. 해당 access_token의 남은 유효시간을 Redis의 TTL로 등록
-     * 3. JwtTokenFilter 파일의 doFIlterInternal 메소드에서 redis에 logout 상태인지 검증하는 로직 추가
-     * */
-    @DeleteMapping("/logout")
-    public ResponseEntity<?> logout(@RequestHeader("Authorization") String accessToken, @RequestBody LogoutRequest request) {
-        authService.logout(accessToken, request);
-        return ResponseEntity.status(HttpStatus.OK).body("User logout!");
     }
 
     /** 실제 서비스 구현할 때는 인가코드를 받는 컨트롤러는 삭제 */
@@ -124,6 +103,41 @@ public class AuthController {
     public ResponseEntity<?> loginByKakao(@RequestBody OauthMemberLoginRequest request) {
         LoginResponse response = authService.loginByKakao(request.getToken());
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+
+    /**
+     * 로그아웃
+     * 1. Redis내의 refresh_token 삭제
+     * 2. Redis에 현재 access_token을 logout 상태로 등록
+     * - 2.1. 해당 access_token의 남은 유효시간을 Redis의 TTL로 등록
+     * 3. JwtTokenFilter 파일의 doFIlterInternal 메소드에서 redis에 logout 상태인지 검증하는 로직 추가
+     * @param request - email
+     * */
+    @DeleteMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String accessToken, @RequestBody LogoutRequest request) {
+        authService.logout(accessToken, request);
+        return ResponseEntity.status(HttpStatus.OK).body("User logout!");
+    }
+
+    /**
+     * 이메일 찾기 By 전화번호 API
+     * @param request phone - 사용자 전화번호
+     * @return response - provider, email
+     */
+    @PostMapping("/find/email")
+    public ResponseEntity<?> findEmailByPhone(@RequestBody @Valid FindEmailByPhoneRequest request){
+        FindEmailResponse response = authService.findEmailByPhone(request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    /**
+     * Access 토큰갱신 API
+     * */
+    @GetMapping("/refresh")
+    public ResponseEntity<?> refreshToken(@RequestHeader("REFRESH_TOKEN") String refreshToken, @RequestBody RefreshRequest request) {
+        String newAccessToken = authService.refreshAccessToken(refreshToken, request);
+        return ResponseEntity.status(HttpStatus.OK).body(newAccessToken);
     }
 
 

@@ -13,5 +13,5 @@ import lombok.Setter;
 public class SmsRequest {
     //    @NotEmpty(message = "휴대폰 번호를 입력해주세요")
     @Pattern(regexp = "^\\d{2,3}-\\d{3,4}-\\d{4}$", message = "전화번호 형식이 올바르지 않습니다.")
-    private String phoneNum;
+    private String phone;
 }

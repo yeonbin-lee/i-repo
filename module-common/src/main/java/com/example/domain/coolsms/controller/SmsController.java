@@ -20,22 +20,32 @@ public class SmsController {
     private final SmsService smsService;
 
 
+    /**
+     * 인증번호 전송 API
+     * @param request - phone 사용자 입력
+     */
     @PostMapping("/send")
-    public ResponseEntity<?> sendSMS(@RequestBody @Valid SmsRequest smsRequest){
-        smsService.sendSms(smsRequest);
+    public ResponseEntity<?> sendSMS(@RequestBody @Valid SmsRequest request){
+        smsService.sendSms(request);
         return ResponseEntity.ok("문자를 전송했습니다.");
     }
 
     /** 비용 문제로 만든 Redis 저장 인증코드*/
     @PostMapping("/fake/send")
-    public ResponseEntity<?> fakeSendSMS(@RequestBody @Valid SmsRequest smsRequest){
-        smsService.fakeSendSms(smsRequest);
+    public ResponseEntity<?> fakeSendSMS(@RequestBody @Valid SmsRequest request){
+        smsService.fakeSendSms(request);
         return ResponseEntity.ok("문자를 전송했습니다.");
     }
 
+    /**
+     * 인증코드 확인
+     * @param request - phone
+     * @param request - code 사용자 입력
+     * @return boolean (true - 일치, false - 불일치)
+     */
     @PostMapping("/verify")
-    public ResponseEntity<?> verifySMS(@RequestBody @Valid SmsVerifyRequest smsVerifyRequest){
-        return new ResponseEntity<>(smsService.verifySms(smsVerifyRequest), HttpStatus.OK);
+    public ResponseEntity<?> verifySMS(@RequestBody @Valid SmsVerifyRequest request){
+        return new ResponseEntity<>(smsService.verifySms(request), HttpStatus.OK);
     }
 
 }

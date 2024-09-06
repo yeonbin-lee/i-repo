@@ -4,6 +4,7 @@ import com.example.domain.member.controller.dto.request.profile.ProfileDeleteReq
 import com.example.domain.member.controller.dto.request.profile.ProfileListRequest;
 import com.example.domain.member.controller.dto.request.profile.ProfileRegisterRequest;
 import com.example.domain.member.controller.dto.request.profile.ProfileUpdateRequest;
+import com.example.domain.member.controller.dto.response.ProfileDTO;
 import com.example.domain.member.entity.Member;
 import com.example.domain.member.entity.Profile;
 import com.example.domain.member.repository.ProfileRepository;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -66,7 +68,7 @@ public class ProfileServiceImpl implements ProfileService{
      */
     @Override
     public void updateProfile(ProfileUpdateRequest request) {
-        Profile profile = findProfileById(request.getProfile_id());
+        Profile profile = findProfileById(request.getProfileId());
 
         profile.setDiabetes(request.getDiabetes());
         profile.setHypertension(request.getHypertension());
@@ -78,11 +80,19 @@ public class ProfileServiceImpl implements ProfileService{
 
     /**
      * 프로필 리스트
+     * profileId, nickname을 포함하는 DTO List로 반환
      */
     @Override
-    public List<Profile> listProfile(ProfileListRequest request){
+    public List<ProfileDTO> listProfile(ProfileListRequest request) {
         List<Profile> profiles = memberService.findByEmail(request.getEmail()).getProfiles();
-        return profiles;
+        System.out.println(profiles);
+        List<ProfileDTO> profileVOList = new ArrayList<>();
+
+        for (Profile profile : profiles) {
+            ProfileDTO profileDTO = new ProfileDTO(profile.getId(), profile.getNickname());
+            profileVOList.add(profileDTO);
+        }
+        return profileVOList;
     }
 
     /**
@@ -95,12 +105,13 @@ public class ProfileServiceImpl implements ProfileService{
     }
 
     /**
-     * 프로필 삭제
+     * 프로필 조회
      */
     @Override
     public Profile searchProfile(Long profileId){
         return findProfileById(profileId);
     }
+
 
     private void deleteProfileById(Long profileId){
         profileRepository.deleteById(profileId);

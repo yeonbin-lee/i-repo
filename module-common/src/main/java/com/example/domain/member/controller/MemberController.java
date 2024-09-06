@@ -18,31 +18,39 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    /** 2. 비밀번호 재설정
-     *  - 비밀번호를 변경하고싶을 경우
+    /**
+     * [일반] 비밀번호 재설정 API - 로그인을 한 상태에서 비밀번호를 변경하고싶을 경우
+     * @param request - originPassword, newPassword 사용자 입력
      * */
     @PutMapping("/change/password")
-    public ResponseEntity<?> changePassword(@RequestHeader("Authorization") String accessToken, @RequestBody @Valid PwChangeRequest pwChangeRequest){
-        memberService.changePassword(accessToken, pwChangeRequest);
+    public ResponseEntity<?> changePassword(@RequestHeader("Authorization") String accessToken, @RequestBody @Valid PwChangeRequest request){
+        memberService.changePassword(accessToken, request);
         return ResponseEntity.status(HttpStatus.OK).body("Password changed successfully!");
     }
 
-    /** 회원 닉네임 수정 */
+    /**
+     * 회원 닉네임 수정 API
+     * @param request - newNickname 사용자 입력
+     *  */
     @PutMapping("/change/nickname")
     public ResponseEntity<?> changeNickname(@RequestHeader("Authorization") String accessToken, @RequestBody @Valid NicknameChangeRequest request) {
         memberService.changeNickname(accessToken, request);
         return ResponseEntity.status(HttpStatus.OK).body("Nickname changed successfully!");
     }
 
-    /** 회원정보 조회 API */
+    /**
+     * 회원정보 조회 API
+     * @return id, role, email, nickname, phone, gender, birthday
+     * */
     @GetMapping("/info")
     public ResponseEntity<?> findUser(@RequestHeader("Authorization") String accessToken) {
-        System.out.println("access_token=" + accessToken);
         MemberResponse userResponseDto = memberService.findById(accessToken);
         return ResponseEntity.status(HttpStatus.OK).body(userResponseDto);
     }
 
-    /** 회원정보 삭제 API */
+    /**
+     * 회원정보 삭제 API
+     * */
     @DeleteMapping("/delete")
     public ResponseEntity<?> deleteUser(@RequestHeader("Authorization") String accessToken) {
         memberService.delete(accessToken);
