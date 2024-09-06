@@ -14,6 +14,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService{
@@ -105,6 +107,10 @@ public class MemberServiceImpl implements MemberService{
         return memberRepository.findByPhone(phone).orElseThrow(
                 () -> new UserNotFoundException("등록되지 않은 전화번호입니다.")
         );
+    }
+
+    public Optional<Member> findOpMemberByEmail(String email) {
+        return memberRepository.findByEmail(email);
     }
 
     public Member findByEmail(String email) {

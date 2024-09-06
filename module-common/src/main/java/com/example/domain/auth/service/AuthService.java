@@ -11,11 +11,16 @@ public interface AuthService {
 
     public String findEmailByPhone(FindEmailByPhoneRequest request);
 
-    public void findPassword(PwFindRequest pwFindRequest);
+    public void findPassword(PwFindRequest request);
 
-    public LoginResponse login(LoginRequest requestDto);
+    /** 인가코드로 액세스 토큰 발급 */
+    public String kakaoAccess(OauthMemberLoginRequest request);
+
+    public LoginResponse login(LoginRequest request);
 
     public String refreshAccessToken(String refreshToken, RefreshRequest request);
 
     public void logout(String accessToken, LogoutRequest request);
+
+    public LoginResponse loginByKakao(String token);
 }
