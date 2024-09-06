@@ -1,6 +1,7 @@
 package com.example.domain.auth.service;
 
 import com.example.domain.auth.controller.dto.request.*;
+import com.example.domain.auth.controller.dto.response.FindEmailResponse;
 import com.example.domain.auth.controller.dto.response.LoginResponse;
 
 public interface AuthService {
@@ -9,7 +10,7 @@ public interface AuthService {
 
     public boolean checkDuplicateEmail(String email);
 
-    public String findEmailByPhone(FindEmailByPhoneRequest request);
+    public FindEmailResponse findEmailByPhone(FindEmailByPhoneRequest request);
 
     public void findPassword(PwFindRequest request);
 

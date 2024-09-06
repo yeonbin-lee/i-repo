@@ -1,6 +1,7 @@
 package com.example.domain.auth.controller;
 
 import com.example.domain.auth.controller.dto.request.*;
+import com.example.domain.auth.controller.dto.response.FindEmailResponse;
 import com.example.domain.auth.controller.dto.response.LoginResponse;
 import com.example.domain.auth.service.AuthService;
 import jakarta.validation.Valid;
@@ -43,8 +44,8 @@ public class AuthController {
      * */
     @PostMapping("/find/email")
     public ResponseEntity<?> findEmailByPhone(@RequestBody @Valid FindEmailByPhoneRequest request){
-        String email = authService.findEmailByPhone(request);
-        return ResponseEntity.status(HttpStatus.OK).body(email);
+        FindEmailResponse response = authService.findEmailByPhone(request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     /**

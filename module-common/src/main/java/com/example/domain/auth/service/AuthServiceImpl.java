@@ -1,6 +1,7 @@
 package com.example.domain.auth.service;
 
 import com.example.domain.auth.controller.dto.request.*;
+import com.example.domain.auth.controller.dto.response.FindEmailResponse;
 import com.example.domain.auth.controller.dto.response.LoginResponse;
 import com.example.domain.auth.service.helper.KakaoClient;
 import com.example.domain.coolsms.entity.Sms;
@@ -118,7 +119,7 @@ public class AuthServiceImpl implements AuthService {
      * 3) Redis 내에 인증코드가 존재한다면 email 반환
      * @return
      */
-    public String findEmailByPhone(FindEmailByPhoneRequest request) {
+    public FindEmailResponse findEmailByPhone(FindEmailByPhoneRequest request) {
 
         String phone = request.getPhone();
 
@@ -128,7 +129,12 @@ public class AuthServiceImpl implements AuthService {
         if (request.getCode().equals(sms.getCode())) {
             Member member = memberService.findByPhone(phone);
             smsService.deletePhone(phone);
-            return member.getEmail();
+            FindEmailResponse findEmailResponse = FindEmailResponse.builder()
+                    .provider(member.getProvider())
+                    .email(member.getEmail())
+                    .build();
+
+            return findEmailResponse;
         }
         // 인증코드가 일치하지않는 경우
         throw new NotEqualsCodeException();
