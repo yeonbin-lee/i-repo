@@ -47,10 +47,15 @@ public class JwtTokenProvider {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
         Date expireDate = new Date(new Date().getTime() + REFRESH_TOKEN_EXPIRE_TIME);
 
+        // getAuthorities()에서 Role을 추출하여 클레임에 설정
+        List<String> roles = customUserDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)  // authority 값을 추출
+                .collect(Collectors.toList());
+
         return Jwts.builder()
                 .setSubject(customUserDetails.getUsername()) // email
                 .claim("user-id", customUserDetails.getId())
-                .claim("role", customUserDetails.getAuthorities())
+                .claim("role", roles.get(0))
                 .setIssuedAt(new Date())
                 .setExpiration(expireDate)
                 .signWith(SignatureAlgorithm.HS512, jwtSecretKey)

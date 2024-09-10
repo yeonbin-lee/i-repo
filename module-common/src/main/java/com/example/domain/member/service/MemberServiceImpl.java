@@ -1,5 +1,6 @@
 package com.example.domain.member.service;
 
+import com.example.domain.auth.service.AuthService;
 import com.example.domain.member.controller.dto.request.member.NicknameChangeRequest;
 import com.example.domain.member.controller.dto.request.member.PwChangeRequest;
 import com.example.domain.member.controller.dto.response.MemberResponse;
@@ -23,6 +24,7 @@ public class MemberServiceImpl implements MemberService{
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final AuthService authService;
 
     /** Member 조회 */
     @Override
@@ -37,7 +39,9 @@ public class MemberServiceImpl implements MemberService{
     @Override
     @Transactional
     public void delete(String accessToken) {
-        memberRepository.delete(findMemberById(findMemberIdByAccessToken(accessToken)));
+        Member member = findMemberById(findMemberIdByAccessToken(accessToken));
+        memberRepository.delete(member);
+        authService.logout(accessToken, member.getEmail()); // accessToken, RefreshToken 무효화
     }
 
 

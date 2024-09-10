@@ -10,15 +10,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/module-admin/admin")
 public class AdminController {
 
+    // 테스팅 용도
     @PostMapping("/aa")
     private ResponseEntity<?> aabb(){
         System.out.println("들어옴");
         return ResponseEntity.status(HttpStatus.OK).body("aa successfully!");
     }
 
-    /**
-     * ADMIN LOGIN API
-     */
+
+
+
+
 
 
 }

@@ -19,9 +19,11 @@ public interface AuthService {
 
     public LoginResponse login(LoginRequest request);
 
+    public LoginResponse adminLogin(LoginRequest request);
+
     public String refreshAccessToken(String refreshToken, RefreshRequest request);
 
-    public void logout(String accessToken, LogoutRequest request);
+    public void logout(String accessToken, String email);
 
     public LoginResponse loginByKakao(String token);
 }

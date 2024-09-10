@@ -208,6 +208,43 @@ public class AuthServiceImpl implements AuthService {
         return loginResponse;
     }
 
+    /** [일반] 어드민 로그인 API */
+    @Transactional
+    public LoginResponse adminLogin(LoginRequest request) {
+        // CHECK EMAIL AND PASSWORD
+
+        Member member = memberService.findByEmail(request.getEmail());
+
+        if (!passwordEncoder.matches(request.getPassword(), member.getPassword())) {
+            throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
+        }
+
+        // GENERATE ACCESS_TOKEN AND REFRESH_TOKEN
+        String accessToken = jwtTokenProvider.generateAccessToken(
+                new UsernamePasswordAuthenticationToken(new CustomUserDetails(member), member.getPassword()));
+        String refreshToken = jwtTokenProvider.generateRefreshToken(
+                new UsernamePasswordAuthenticationToken(new CustomUserDetails(member), member.getPassword()));
+
+
+        // REFRESH_TOKEN SAVE IN REDIS
+        refreshTokenService.saveRefreshToken(
+                RefreshToken.builder()
+                        .id(request.getEmail())
+                        .refresh_token(refreshToken)
+                        .expiration(14) // 2주
+                        .build()
+        );
+
+        LoginResponse loginResponse = LoginResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .nickname(member.getNickname())
+                .email(member.getEmail())
+                .build();
+
+        return loginResponse;
+    }
+
     /** Token 갱신 */
     @Transactional
     public String refreshAccessToken(String refreshToken, RefreshRequest request) {
@@ -223,8 +260,7 @@ public class AuthServiceImpl implements AuthService {
         return null;
     }
 
-    public void logout(String accessToken, LogoutRequest request) {
-        String email = request.getEmail();
+    public void logout(String accessToken, String email) {
         String token = accessToken.substring(7);
         // Redis 내의 기존 refreshToken 삭제
         if (!refreshTokenService.existsById(email)){

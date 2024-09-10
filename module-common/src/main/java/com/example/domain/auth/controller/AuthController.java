@@ -67,6 +67,12 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(loginResponse);
     }
 
+    @PostMapping("/admin/login")
+    public ResponseEntity<?> adminLogin(@RequestBody @Valid LoginRequest request) {
+        LoginResponse loginResponse = authService.adminLogin(request);
+        return ResponseEntity.status(HttpStatus.OK).body(loginResponse);
+    }
+
     /** 실제 서비스 구현할 때는 인가코드를 받는 컨트롤러는 삭제 */
     @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     private String KAKAO_CLIENT_ID;
@@ -115,7 +121,7 @@ public class AuthController {
      * */
     @DeleteMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String accessToken, @RequestBody LogoutRequest request) {
-        authService.logout(accessToken, request);
+        authService.logout(accessToken, request.getEmail());
         return ResponseEntity.status(HttpStatus.OK).body("User logout!");
     }
 

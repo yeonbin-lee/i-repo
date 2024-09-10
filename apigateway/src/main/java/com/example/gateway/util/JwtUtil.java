@@ -9,6 +9,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.List;
 import java.util.function.Function;
 
 @Component
@@ -87,8 +88,10 @@ public class JwtUtil {
     }
 
     // 토큰에서 역할(Role) 추출
-    public String extractRole(String token) {
-        String role = extractClaim(token, claims -> claims.get("role", String.class));
-        return role;
-    }
+//    public String extractRole(String token) {
+//        String role = extractClaim(token, claims -> claims.get("role", String.class));
+//        return role;
+//    }
+
+
 }

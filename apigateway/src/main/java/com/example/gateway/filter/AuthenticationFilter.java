@@ -18,7 +18,6 @@ import java.util.List;
 @Order(1)
 public class AuthenticationFilter implements GlobalFilter {
 
-
     private final List<String> excludedPaths = List.of(
             "/eureka",
             "/module-common/auth/login",
@@ -32,7 +31,7 @@ public class AuthenticationFilter implements GlobalFilter {
             "/module-common/auth/refresh",
             "/module-common/sms/fake/send",
             "/module-common/sms/verify",
-            "/module-admin/admin/login"
+            "/module-common/auth/admin/login"
             );  // 필터를 적용하지 않을 경로
 
 

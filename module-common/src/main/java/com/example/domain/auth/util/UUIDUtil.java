@@ -1,7 +1,10 @@
 package com.example.domain.auth.util;
 
+import org.springframework.stereotype.Component;
+
 import java.util.UUID;
 
+@Component
 public class UUIDUtil {
 
     // 4자리 UUID 생성 메서드
