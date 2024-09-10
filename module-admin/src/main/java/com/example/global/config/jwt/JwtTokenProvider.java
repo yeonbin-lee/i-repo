@@ -4,12 +4,9 @@ import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -26,16 +23,10 @@ public class JwtTokenProvider {
     public String generateAccessToken(Authentication authentication) {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
         Date expireDate = new Date(new Date().getTime() + ACCESS_TOKEN_EXPIRE_TIME);
-
-        // getAuthorities()에서 Role을 추출하여 클레임에 설정
-        List<String> roles = customUserDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)  // authority 값을 추출
-                .collect(Collectors.toList());
-
         return Jwts.builder()
                 .setSubject(customUserDetails.getUsername()) // email
                 .claim("user-id", customUserDetails.getId())
-                .claim("role", roles.get(0))
+//                .claim("user-email", customUserDetails.get)
                 .setIssuedAt(new Date())
                 .setExpiration(expireDate)
                 .signWith(SignatureAlgorithm.HS512, jwtSecretKey)
@@ -50,7 +41,7 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setSubject(customUserDetails.getUsername()) // email
                 .claim("user-id", customUserDetails.getId())
-                .claim("role", customUserDetails.getAuthorities())
+//                .claim("user-email", customUserDetails.getEmail())
                 .setIssuedAt(new Date())
                 .setExpiration(expireDate)
                 .signWith(SignatureAlgorithm.HS512, jwtSecretKey)
@@ -83,8 +74,6 @@ public class JwtTokenProvider {
 //    }
 
     public Date getExpirationFromToken(String token) {
-        System.out.println("token= " + token);
-
         return Jwts.parser()
                 .setSigningKey(jwtSecretKey)
                 .parseClaimsJws(token)
@@ -111,4 +100,3 @@ public class JwtTokenProvider {
     }
 
 }
-

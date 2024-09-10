@@ -21,11 +21,11 @@ public class SmsServiceImpl implements SmsService {
     private final RedisTemplate<String, Object> redisTemplate;
 
     @Override // SmsService 인터페이스 메서드 구현
-    public void sendSms(SmsRequest request) {
+    public String sendSms(SmsRequest request) {
         String phone = request.getPhone(); // SmsrequestDto에서 전화번호를 가져온다.
 
-        String certificationCode = Integer.toString((int)(Math.random() * (999999 - 100000 + 1)) + 100000); // 6자리 인증 코드를 랜덤으로 생성
-        smsCertificationUtil.sendSMS(phone, String.valueOf(certificationCode)); // SMS 인증 유틸리티를 사용하여 SMS 발송
+        String code = Integer.toString((int)(Math.random() * (999999 - 100000 + 1)) + 100000); // 6자리 인증 코드를 랜덤으로 생성
+        smsCertificationUtil.sendSMS(phone, String.valueOf(code)); // SMS 인증 유틸리티를 사용하여 SMS 발송
 
         // 이미 인증코드를 발급받았다면 해당 전화번호의 인증코드를 삭제한다.
         if (existsByPhone(phone)){
@@ -36,20 +36,19 @@ public class SmsServiceImpl implements SmsService {
         saveSms(
                 Sms.builder()
                         .id(phone)
-                        .code(certificationCode)
-                        .expiration(180) // 180 = 60 * 3 (5분)
+                        .code(code)
+                        .expiration(180) // 300 = 60 * 3 (3분)
                         .build()
         );
-
+        return code;
     }
 
 
     @Override // SmsService 인터페이스 메서드 구현
-    public void fakeSendSms(SmsRequest request) {
+    public String fakeSendSms(SmsRequest request) {
         String phone = request.getPhone(); // SmsrequestDto에서 전화번호를 가져온다.
 
-        String certificationCode = Integer.toString((int)(Math.random() * (999999 - 100000 + 1)) + 100000); // 6자리 인증 코드를 랜덤으로 생성
-        System.out.println("code = " + certificationCode);
+        String code = Integer.toString((int)(Math.random() * (999999 - 100000 + 1)) + 100000); // 6자리 인증 코드를 랜덤으로 생성
         // 이미 인증코드를 발급받았다면 해당 전화번호의 인증코드를 삭제한다.
         if (existsByPhone(phone)){
             deleteByPhone(phone);
@@ -59,10 +58,12 @@ public class SmsServiceImpl implements SmsService {
         saveSms(
                 Sms.builder()
                         .id(phone)
-                        .code(certificationCode)
+                        .code(code)
                         .expiration(180) // 180 = 60 * 3 (5분)
                         .build()
         );
+
+        return code;
     }
 
 
@@ -70,7 +71,7 @@ public class SmsServiceImpl implements SmsService {
     public boolean verifySms(SmsVerifyRequest request){
         String phone = request.getPhone();
         Sms sms =  findSmsByPhone(phone);
-        if(sms.getCode().equals(request.getCertificationCode())){
+        if(sms.getCode().equals(request.getCode())){
             deleteByPhone(phone);
             verifyPhone(phone);
             return true;

@@ -7,4 +7,5 @@ include 'module-eureka'
 include 'module-common'
 include 'aaa'
 include 'apigateway'
+include 'module-admin'
 

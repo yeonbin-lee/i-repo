@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/sms")
+@RequestMapping("/module-common/sms")
 public class SmsController {
 
     private final SmsService smsService;
@@ -26,15 +26,15 @@ public class SmsController {
      */
     @PostMapping("/send")
     public ResponseEntity<?> sendSMS(@RequestBody @Valid SmsRequest request){
-        smsService.sendSms(request);
-        return ResponseEntity.ok("문자를 전송했습니다.");
+        String code = smsService.sendSms(request);
+        return ResponseEntity.ok(code);
     }
 
     /** 비용 문제로 만든 Redis 저장 인증코드*/
     @PostMapping("/fake/send")
     public ResponseEntity<?> fakeSendSMS(@RequestBody @Valid SmsRequest request){
-        smsService.fakeSendSms(request);
-        return ResponseEntity.ok("문자를 전송했습니다.");
+        String code = smsService.fakeSendSms(request);
+        return ResponseEntity.ok(code);
     }
 
     /**

@@ -45,3 +45,4 @@ out/
 /module-core/src/main/resources/application.yml
 /module-eureka/src/main/resources/application.yml
 /module-notification/src/main/resources/application.yml
+/module-admin/src/main/resources/application.yml

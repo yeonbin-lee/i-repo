@@ -1,6 +1,6 @@
 package com.example.global.config.jwt;
 
-import com.example.domain.member.entity.Member;
+import com.example.domain.entity.Member;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,7 +18,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-            return Collections.singleton(new SimpleGrantedAuthority(member.getRole().name()));
+        return Collections.singleton(new SimpleGrantedAuthority(member.getRole().name()));
     }
 
     public Long getId() {
@@ -56,4 +56,3 @@ public class CustomUserDetails implements UserDetails {
         return true;
     }
 }
-

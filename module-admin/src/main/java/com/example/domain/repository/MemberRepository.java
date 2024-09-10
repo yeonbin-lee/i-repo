@@ -1,6 +1,6 @@
-package com.example.domain.member.repository;
+package com.example.domain.repository;
 
-import com.example.domain.member.entity.Member;
+import com.example.domain.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
@@ -14,5 +14,4 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     boolean existsByPhone(String phone);
     boolean existsByNickname(String nickname);
     Optional<Member> findByPhone(String phone);
-    Optional<Member> findByEmailAndPhone(String email, String phone);
 }

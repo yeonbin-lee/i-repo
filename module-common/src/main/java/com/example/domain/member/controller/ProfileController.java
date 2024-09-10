@@ -16,7 +16,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/profile")
+@RequestMapping("/module-common/profile")
 public class ProfileController {
 
     private final ProfileService profileService;
@@ -61,6 +61,7 @@ public class ProfileController {
     /**
      * 프로필 삭제 API
      * @param request - profileId
+     * 기본 프로필 삭제 불가, 추가 프로필만 삭제 가능
      * */
     @DeleteMapping("/delete")
     public ResponseEntity<?> deleteProfile(@RequestBody ProfileDeleteRequest request) {

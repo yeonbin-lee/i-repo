@@ -1,84 +1,74 @@
 package com.example.gateway.filter;
 
-import com.example.gateway.exception.InvalidAuthorizationHeaderFormatException;
-import com.example.gateway.exception.MissingAuthorizationHeaderException;
 import com.example.gateway.exception.UnauthorizedAccessException;
 import com.example.gateway.util.JwtUtil;
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.gateway.filter.GatewayFilter;
-import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-// Global Filter 적용
 @Component
-@Slf4j
-public class AuthenticationFilter extends AbstractGatewayFilterFactory<AuthenticationFilter.Config> {
+@Order(1)
+public class AuthenticationFilter implements GlobalFilter {
 
-    @Autowired
-    private RouteValidator validator;
+
+    private final List<String> excludedPaths = List.of(
+            "/eureka",
+            "/module-common/auth/login",
+            "/module-common/auth/signup",
+            "/module-common/auth/find/email",
+            "/module-common/auth/email/duplicate",
+            "/module-common/auth/phone/find/password",
+            "/module-common/auth/kakao/authorize", // <- 이후 컨트롤러와 삭제 필요
+            "/module-common/auth/kakao/access",
+            "/module-common/auth/kakao/login",
+            "/module-common/auth/refresh",
+            "/module-common/sms/fake/send",
+            "/module-common/sms/verify",
+            "/module-admin/admin/login"
+            );  // 필터를 적용하지 않을 경로
+
 
     @Autowired
     private JwtUtil jwtUtil;
 
-    public AuthenticationFilter() {
-        super(Config.class);
-    }
-
     @Override
-    public GatewayFilter apply(Config config) {
-        // pre
-        return (exchange, chain) -> {
-            ServerHttpRequest request = exchange.getRequest();
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        String path = exchange.getRequest().getPath().toString();
+        System.out.println("Request Path: " + path);  // 경로를 로그로 확인
 
-            if (validator.isSecured.test(request)) {
-                // JWT 검증 로직
-                List<String> authHeaders = request.getHeaders().get(HttpHeaders.AUTHORIZATION);
+        // 로그인 및 회원가입 경로는 JWT 검증하지 않음
+        if (excludedPaths.contains(path)) {
+            return chain.filter(exchange);
+        }
 
-                if (authHeaders == null || authHeaders.isEmpty()) {
-                    throw new MissingAuthorizationHeaderException();
-                }
+        String authorizationHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
 
-                String authHeader = authHeaders.get(0);
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+            return exchange.getResponse().setComplete();
+        }
 
-                if (authHeader.startsWith("Bearer ")) {
-                    String token = authHeader.substring(7);
+        String token = authorizationHeader.substring(7);
 
-                    try {
-                        jwtUtil.validateToken(token);
+        if (!jwtUtil.validateToken(token)) {
+            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+            return exchange.getResponse().setComplete();
+        }
 
-                        // 로그아웃 체크
-                        if (jwtUtil.isTokenLogout(token)) {
-                            throw new UnauthorizedAccessException();
-                        }
-                    } catch (Exception e) {
-                        throw new UnauthorizedAccessException();
-                    }
+//         로그아웃 체크
+        if (jwtUtil.isTokenLogout(token)) {
+            throw new UnauthorizedAccessException();
+        }
 
-                } else {
-                    throw new InvalidAuthorizationHeaderFormatException();
-                }
-            }
-
-            // post
-            return chain.filter(exchange).then(Mono.fromRunnable(() -> {
-                ServerHttpResponse response = exchange.getResponse();
-                log.info("Custom Post filter: response code: " + response.getStatusCode());
-            }));
-        };
+        return chain.filter(exchange);
     }
 
-    @Data
-    public static class Config {
-        private String baseMessage;
-        private boolean preLogger;
-        private boolean postLogger;
-    }
 }

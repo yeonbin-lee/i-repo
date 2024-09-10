@@ -18,5 +18,7 @@ public class LoginResponse {
 
     private String refreshToken;
 
-    private Member member;
+    private String nickname;
+
+    private String email;
 }

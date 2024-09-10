@@ -3,7 +3,9 @@ package com.example.domain.auth.service;
 import com.example.domain.auth.controller.dto.request.*;
 import com.example.domain.auth.controller.dto.response.FindEmailResponse;
 import com.example.domain.auth.controller.dto.response.LoginResponse;
+import com.example.domain.auth.controller.vo.TokenResponse;
 import com.example.domain.auth.service.helper.KakaoClient;
+import com.example.domain.auth.util.UUIDUtil;
 import com.example.domain.coolsms.entity.Sms;
 import com.example.domain.coolsms.service.SmsService;
 import com.example.domain.member.controller.vo.KakaoInfo;
@@ -61,6 +63,7 @@ public class AuthServiceImpl implements AuthService {
     private final KakaoClient kakaoClient;
     private final LogoutService logoutService;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final UUIDUtil uuidUtil;
 
 
     /** [일반] 이메일 회원가입 API
@@ -107,10 +110,10 @@ public class AuthServiceImpl implements AuthService {
         memberService.saveMember(member);
     }
 
-    /** 이메일 중복체크 */
-    public boolean checkDuplicateEmail(String email){
-        return memberService.existByEmail(email);
-    }
+//    /** 이메일 중복체크 */
+//    public boolean checkDuplicateEmail(String email){
+//        return memberService.existByEmail(email);
+//    }
 
     /**
      * 전화번호로 이메일 찾기
@@ -126,7 +129,7 @@ public class AuthServiceImpl implements AuthService {
             throw new DataIntegrityViolationException("잘못된 요청입니다.");
         }
 
-        // 회원가입 후 Redis에 저장된 전화번호 인증 정보를 삭제
+        // Redis에 저장된 전화번호 인증 정보를 삭제
         deletePhoneNumberVerification(request.getPhone());
 
         Member member = memberService.findByPhone(request.getPhone());
@@ -159,11 +162,10 @@ public class AuthServiceImpl implements AuthService {
         if(!isTokenPhone(request.getPhone())){
             throw new DataIntegrityViolationException("잘못된 요청입니다.");
         }
-
-        // 회원가입 후 Redis에 저장된 전화번호 인증 정보를 삭제
+        // Redis에 저장된 전화번호 인증 정보를 삭제
         deletePhoneNumberVerification(request.getPhone());
-        Member member = memberService.findByPhone(request.getPhone());
 
+        Member member = memberService.findByEmailAndPhone(request.getEmail(), request.getPhone());
         member.updatePassword(passwordEncoder.encode(request.getPassword()));
         memberService.saveMember(member);
     }
@@ -197,9 +199,10 @@ public class AuthServiceImpl implements AuthService {
         );
 
         LoginResponse loginResponse = LoginResponse.builder()
-                .member(member)
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .nickname(member.getNickname())
+                .email(member.getEmail())
                 .build();
 
         return loginResponse;
@@ -222,18 +225,20 @@ public class AuthServiceImpl implements AuthService {
 
     public void logout(String accessToken, LogoutRequest request) {
         String email = request.getEmail();
+        String token = accessToken.substring(7);
         // Redis 내의 기존 refreshToken 삭제
         if (!refreshTokenService.existsById(email)){
             // 리프레시 토큰 없다고 예외처리 날려야됨
         }
         refreshTokenService.deleteById(email);
+
         // access_token의 남은 유효시간 가져오기 (Seconds 단위)
-        Date expirationFromToken = jwtTokenProvider.getExpirationFromToken(accessToken);
+        Date expirationFromToken = jwtTokenProvider.getExpirationFromToken(token);
         Date today = new Date();
         Integer sec = (int) ((expirationFromToken.getTime() - today.getTime()) / 1000);
 
         // accessToken을 Redis의 key 값으로 등록
-        logoutService.logoutUser(accessToken.substring(7), sec); // "Bearer "삭제
+        logoutService.logoutUser(token, sec); // "Bearer "삭제
     }
 
 
@@ -304,9 +309,6 @@ public class AuthServiceImpl implements AuthService {
             // access 토큰 만료되면 refresh token사용(유효기간 더 김)
             refresh_Token = kakaoToken.getRefresh_token();
 
-            log.info(access_Token);
-            log.info(refresh_Token);
-
             br.close();
             bw.close();
         } catch (IOException e) {
@@ -320,40 +322,63 @@ public class AuthServiceImpl implements AuthService {
      */
     public LoginResponse loginByKakao(String token) {
         System.out.println("[카카오] 받은 액세스 토큰="+ token);
-        Member member = signInByProvider(token);
-
-        Optional<Member> findMember = memberService.findOpMemberByEmail(member.getEmail());
+        String email = signInByKakao(token);
+        Member member = new Member();
+        Optional<Member> findMember = memberService.findOpMemberByEmail(email);
         if (findMember.isEmpty()) { // 최초 로그인 시 회원가입
+            member = singUpByKakao(token);
             memberService.saveMember(member);
+        } else {
+            member = findMember.get();
         }
-        return createAndSaveToken(member);
+        TokenResponse tokenResponse = createAndSaveToken(member);
+
+        return LoginResponse.builder()
+                .accessToken(tokenResponse.getAccessToken())
+                .refreshToken(tokenResponse.getRefreshToken())
+                .nickname(member.getNickname())
+                .email(member.getEmail())
+                .build();
     }
 
-
-    private Member signInByProvider(String token) {
-
+    private String signInByKakao(String token) {
         // 카카오 로그인
+        KakaoInfo memberInfo = kakaoClient.getUserInfo("Bearer " + token);
+        return memberInfo.getKakaoAccount().getEmail();
+    }
+
+    private Member singUpByKakao(String token) {
+
+        // 카카오 회원가입
         KakaoInfo memberInfo = kakaoClient.getUserInfo("Bearer " + token);
         String email = memberInfo.getKakaoAccount().getEmail();
         String nickname = memberInfo.getKakaoAccount().getProfile().getNickname();
+
+        // 닉네임 중복 방지
+        String newNickname = generateNicknameWithUUID(nickname);
+        while (memberService.existByNickname(newNickname)){
+            newNickname = generateNicknameWithUUID(nickname);
+        }
+
         String gender = memberInfo.getKakaoAccount().getGender();
         // 생년
         String birthyear = memberInfo.getKakaoAccount().getBirthyear();
         // 월일
         String birthday = memberInfo.getKakaoAccount().getBirthday();
         String phone = memberInfo.getKakaoAccount().getPhone_number();
-        System.out.println("받아온 Phone정보=" + phone);
 
         // LocalDate 타입 변환 형식 지정 (yyyy-mm-dd)
         String birth_str = birthyear + "-" + birthday.substring(0,2) + "-" + birthday.substring(2,4);
         LocalDate birth = LocalDate.parse(birth_str, DateTimeFormatter.ISO_DATE);
 
         String password = socialRandomPassword(email);
-        Member member = new Member(nickname, email, password, phone, Gender.valueOf(gender.toUpperCase()), birth, Role.ROLE_USER, Provider.KAKAO);
+        Member member = new Member(newNickname, email, password, phone, Gender.valueOf(gender.toUpperCase()), birth, Role.ROLE_USER, Provider.KAKAO);
         return member;
     }
 
-    private LoginResponse createAndSaveToken(Member member) {
+
+
+    private TokenResponse createAndSaveToken(Member member) {
         String accessToken = jwtTokenProvider.generateAccessToken(new UsernamePasswordAuthenticationToken(new CustomUserDetails(member), member.getPassword()));
         String refreshToken = jwtTokenProvider.generateRefreshToken(new UsernamePasswordAuthenticationToken(new CustomUserDetails(member), member.getPassword()));
         refreshTokenService.saveRefreshToken(
@@ -363,13 +388,12 @@ public class AuthServiceImpl implements AuthService {
                         .expiration(14)
                         .build());
 
-        LoginResponse loginResponse = LoginResponse.builder()
-                .member(member)
+        TokenResponse tokenResponse = TokenResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
 
-        return loginResponse;
+        return tokenResponse;
     }
 
     private String socialRandomPassword(String email) {
@@ -395,4 +419,9 @@ public class AuthServiceImpl implements AuthService {
         redisTemplate.delete(key);  // 해당 키를 삭제
     }
 
+    // 4자리 UUID를 닉네임 뒤에 붙여서 생성하는 메서드
+    private String generateNicknameWithUUID(String baseNickname) {
+        String uuid4 = UUIDUtil.generate4CharUUID();
+        return baseNickname + uuid4;
+    }
 }

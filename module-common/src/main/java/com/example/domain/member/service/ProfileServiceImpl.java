@@ -68,7 +68,7 @@ public class ProfileServiceImpl implements ProfileService{
      */
     @Override
     public void updateProfile(ProfileUpdateRequest request) {
-        Profile profile = findProfileById(request.getProfileId());
+        Profile profile = searchProfile(request.getProfileId());
 
         profile.setDiabetes(request.getDiabetes());
         profile.setHypertension(request.getHypertension());
@@ -97,10 +97,15 @@ public class ProfileServiceImpl implements ProfileService{
 
     /**
      * 프로필 삭제
+     * 기본 프로필 삭제 불가, 추가 프로필만 삭제 가능
      */
     @Override
     public void deleteProfile(ProfileDeleteRequest request){
         Long profileId = request.getProfileId();
+        Profile profile = searchProfile(request.getProfileId());
+        if(profile.getOwner() == true) {
+            throw new IllegalArgumentException("기본 프로필은 삭제할 수 없습니다.");
+        }
         deleteProfileById(profileId);
     }
 
@@ -109,7 +114,9 @@ public class ProfileServiceImpl implements ProfileService{
      */
     @Override
     public Profile searchProfile(Long profileId){
-        return findProfileById(profileId);
+        return profileRepository.findById(profileId).orElseThrow(
+                () -> new IllegalArgumentException("존재하지 않는 프로필")
+        );
     }
 
 
@@ -121,9 +128,9 @@ public class ProfileServiceImpl implements ProfileService{
         profileRepository.save(profile);
     }
 
-    private Profile findProfileById(Long profileId){
-        return profileRepository.findById(profileId).orElseThrow(
-                () -> new IllegalArgumentException("존재하지 않는 프로필")
-        );
-    }
+//    private Profile findProfileById(Long profileId){
+//        return profileRepository.findById(profileId).orElseThrow(
+//                () -> new IllegalArgumentException("존재하지 않는 프로필")
+//        );
+//    }
 }

@@ -1,10 +1,7 @@
 package com.example.domain.member.entity;
 
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.TimeToLive;
 
@@ -15,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 @AllArgsConstructor
 @Builder
 @RedisHash("logout")
-//@NoArgsConstructor
+@NoArgsConstructor
 public class Logout {
 
     @Id

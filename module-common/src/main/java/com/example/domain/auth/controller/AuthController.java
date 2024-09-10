@@ -14,11 +14,10 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @Controller
-@RequestMapping("/auth")
+@RequestMapping("/module-common/auth")
 public class AuthController {
 
     private final AuthService authService;
-
 
     /**
      * [일반] 이메일 회원가입 API
@@ -35,23 +34,23 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body("User registered successfully!");
     }
 
-    /**
-     * [일반] 이메일 중복체크 API
-     * @param request - email
-     * @return response - boolean (true - 이메일이 이미 존재할 경우, false - 사용할 수 있는 이메일)
-     * */
-    @PostMapping("/email/duplicate")
-    public ResponseEntity<?> emailDuplicate(@RequestBody @Valid CheckEmailDuplicateRequest request){
-        Boolean checkEmailDuplicate = authService.checkDuplicateEmail(request.getEmail());
-        return ResponseEntity.status(HttpStatus.OK).body(checkEmailDuplicate);
-    }
+//    /**
+//     * [일반] 이메일 중복체크 API
+//     * @param request - email
+//     * @return response - boolean (true - 이메일이 이미 존재할 경우, false - 사용할 수 있는 이메일)
+//     * */
+//    @PostMapping("/email/duplicate")
+//    public ResponseEntity<?> emailDuplicate(@RequestBody @Valid CheckEmailDuplicateRequest request){
+//        Boolean checkEmailDuplicate = authService.checkDuplicateEmail(request.getEmail());
+//        return ResponseEntity.status(HttpStatus.OK).body(checkEmailDuplicate);
+//    }
 
     /**
-     * [일반] 비밀번호 재설정 API - 비밀번호를 잊어버렸을 경우
+     * [일반] 비밀번호 재설정 API by phone - 비밀번호를 잊어버렸을 경우
      * @param request - phone 사용자의 전화번호
      * @param request - password 비밀번호로 설정할 새로운 비밀번호
      * */
-    @PutMapping("/find/password")
+    @PutMapping("/phone/find/password")
     public ResponseEntity<?> findPassword(@RequestBody @Valid PwFindRequest request){
         authService.findPassword(request);
         return ResponseEntity.status(HttpStatus.OK).body("Password changed successfully!");
@@ -125,7 +124,7 @@ public class AuthController {
      * @param request phone - 사용자 전화번호
      * @return response - provider, email
      */
-    @PostMapping("/find/email")
+    @GetMapping("/find/email")
     public ResponseEntity<?> findEmailByPhone(@RequestBody @Valid FindEmailByPhoneRequest request){
         FindEmailResponse response = authService.findEmailByPhone(request);
         return ResponseEntity.status(HttpStatus.OK).body(response);

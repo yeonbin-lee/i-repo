@@ -21,4 +21,5 @@ public interface MemberService {
     public void changePassword(String accessToken, PwChangeRequest request);
     public void changeNickname(String accessToken, NicknameChangeRequest request);
     public Optional<Member> findOpMemberByEmail(String email);
+    public Member findByEmailAndPhone(String email, String phone);
 }

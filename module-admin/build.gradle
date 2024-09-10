@@ -7,6 +7,7 @@ plugins {
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
@@ -18,35 +19,22 @@ repositories {
 }
 
 ext {
-    // Feign
     set('springCloudVersion', '2023.0.1')
-    set('commonsLangVersion', '3.12.0')
 }
 
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-    }
-}
+//bootJar.enabled = false
+//jar.enabled = true
 
 
 dependencies {
-
-    // Email
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
     implementation 'de.codecentric:spring-boot-admin-starter-client:3.2.2'
     implementation 'org.projectlombok:lombok:1.18.34'
-
-    // CoolSMS
-    implementation 'net.nurigo:sdk:4.3.0'
 
     //Jwt
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
@@ -54,10 +42,6 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
     implementation 'commons-codec:commons-codec:1.5'
-    implementation 'com.auth0:java-jwt:3.13.0'
-
-    // CoolSMS
-    implementation 'net.nurigo:sdk:4.3.0'
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.postgresql:postgresql'
@@ -72,6 +56,7 @@ dependencyManagement {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
     }
 }
+
 
 tasks.named('test') {
     useJUnitPlatform()

@@ -118,4 +118,10 @@ public class MemberServiceImpl implements MemberService{
                 () -> new UserNotFoundException("존재하지 않는 이메일 정보입니다.")
         );
     }
+
+    public Member findByEmailAndPhone(String email, String phone){
+        return memberRepository.findByEmailAndPhone(email, phone).orElseThrow(
+                () -> new UserNotFoundException("이메일 정보와 휴대폰 정보가 일치하지 않습니다.")
+        );
+    }
 }
