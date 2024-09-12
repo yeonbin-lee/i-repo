@@ -5,6 +5,7 @@ import com.example.domain.member.controller.dto.request.profile.ProfileListReque
 import com.example.domain.member.controller.dto.request.profile.ProfileRegisterRequest;
 import com.example.domain.member.controller.dto.request.profile.ProfileUpdateRequest;
 import com.example.domain.member.controller.dto.response.ProfileDTO;
+import com.example.domain.member.controller.dto.response.ProfileResponse;
 import com.example.domain.member.entity.Profile;
 
 import java.util.List;
@@ -24,6 +25,6 @@ public interface ProfileService {
     public void deleteProfile(ProfileDeleteRequest request);
 
     // 프로필 조회
-    public Profile searchProfile(Long profileId);
+    public ProfileResponse searchProfile(Long profileId);
 }
 

@@ -50,7 +50,7 @@ public class AuthController {
      * @param request - phone 사용자의 전화번호
      * @param request - password 비밀번호로 설정할 새로운 비밀번호
      * */
-    @PutMapping("/phone/find/password")
+    @PutMapping("/phone/change/password")
     public ResponseEntity<?> findPassword(@RequestBody @Valid PwFindRequest request){
         authService.findPassword(request);
         return ResponseEntity.status(HttpStatus.OK).body("Password changed successfully!");

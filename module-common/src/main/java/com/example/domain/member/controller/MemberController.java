@@ -68,8 +68,8 @@ public class MemberController {
      * */
     @GetMapping("/info")
     public ResponseEntity<?> findUser(@RequestHeader("Authorization") String accessToken) {
-        MemberResponse userResponseDto = memberService.findById(accessToken);
-        return ResponseEntity.status(HttpStatus.OK).body(userResponseDto);
+        MemberResponse response = memberService.findById(accessToken);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
 }

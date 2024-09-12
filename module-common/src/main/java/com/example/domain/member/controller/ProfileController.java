@@ -5,6 +5,7 @@ import com.example.domain.member.controller.dto.request.profile.ProfileListReque
 import com.example.domain.member.controller.dto.request.profile.ProfileRegisterRequest;
 import com.example.domain.member.controller.dto.request.profile.ProfileUpdateRequest;
 import com.example.domain.member.controller.dto.response.ProfileDTO;
+import com.example.domain.member.controller.dto.response.ProfileResponse;
 import com.example.domain.member.entity.Profile;
 import com.example.domain.member.service.profileService.ProfileService;
 import lombok.RequiredArgsConstructor;
@@ -73,10 +74,10 @@ public class ProfileController {
      * 프로필 조회 API
      * @param profileId
      * */
-    @GetMapping("/search/{profile_id}")
-    public ResponseEntity<?> searchProfile(@PathVariable Long profileId) {
-        Profile profile = profileService.searchProfile(profileId);
-        return ResponseEntity.status(HttpStatus.OK).body(profile);
+    @GetMapping("/search/{profileId}")
+    public ResponseEntity<?> searchProfile(@PathVariable("profileId") Long profileId) {
+        ProfileResponse profileResponse = profileService.searchProfile(profileId);
+        return ResponseEntity.status(HttpStatus.OK).body(profileResponse);
     }
 
 }

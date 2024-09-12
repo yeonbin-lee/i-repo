@@ -19,8 +19,6 @@ import java.util.List;
 @Setter
 public class SignupRequest {
 
-    private Role role;
-
     @NotBlank(message = "이메일은 필수 입력값입니다.")
     @Email(message = "이메일 형식이 올바르지 않습니다.")
     private String email;
@@ -42,18 +40,4 @@ public class SignupRequest {
     @MinimumAge
     private LocalDate birthday;
 
-    private Provider provider;
-
-    public Member toEntity() {
-        return Member.builder()
-                .role(this.role)
-                .email(this.email)
-                .nickname(this.nickname)
-                .password(this.password)
-                .phone(this.phone)
-                .gender(this.gender)
-                .birthday(this.birthday)
-                .provider(this.provider)
-                .build();
-    }
 }

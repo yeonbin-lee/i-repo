@@ -17,14 +17,14 @@ public class MemberResponse {
     private String gender;
     private LocalDate birthday;
 
-    public MemberResponse(Member entity) {
-        this.id = entity.getId();
-        this.email = entity.getEmail();
-        this.nickname = entity.getNickname();
-        this.phone = entity.getPhone();
-        this.gender = entity.getGender().name();
-        this.birthday = entity.getBirthday();
+    public MemberResponse(Member member) {
+        this.id = member.getId();
+        this.email = member.getEmail();
+        this.nickname = member.getNickname();
+        this.phone = member.getPhone();
+        this.gender = member.getGender().name();
+        this.birthday = member.getBirthday();
         // Enum -> String
-        this.role = entity.getRole().name();
+        this.role = member.getRole().name();
     }
 }

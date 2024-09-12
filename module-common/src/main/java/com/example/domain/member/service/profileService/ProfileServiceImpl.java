@@ -5,6 +5,7 @@ import com.example.domain.member.controller.dto.request.profile.ProfileListReque
 import com.example.domain.member.controller.dto.request.profile.ProfileRegisterRequest;
 import com.example.domain.member.controller.dto.request.profile.ProfileUpdateRequest;
 import com.example.domain.member.controller.dto.response.ProfileDTO;
+import com.example.domain.member.controller.dto.response.ProfileResponse;
 import com.example.domain.member.entity.Member;
 import com.example.domain.member.entity.Profile;
 import com.example.domain.member.repository.ProfileRepository;
@@ -69,7 +70,7 @@ public class ProfileServiceImpl implements ProfileService{
      */
     @Override
     public void updateProfile(ProfileUpdateRequest request) {
-        Profile profile = searchProfile(request.getProfileId());
+        Profile profile = findProfile(request.getProfileId());
 
         profile.setDiabetes(request.getDiabetes());
         profile.setHypertension(request.getHypertension());
@@ -103,7 +104,7 @@ public class ProfileServiceImpl implements ProfileService{
     @Override
     public void deleteProfile(ProfileDeleteRequest request){
         Long profileId = request.getProfileId();
-        Profile profile = searchProfile(request.getProfileId());
+        Profile profile = findProfile(request.getProfileId());
         if(profile.getOwner() == true) {
             throw new IllegalArgumentException("기본 프로필은 삭제할 수 없습니다.");
         }
@@ -114,7 +115,14 @@ public class ProfileServiceImpl implements ProfileService{
      * 프로필 조회
      */
     @Override
-    public Profile searchProfile(Long profileId){
+    public ProfileResponse searchProfile(Long profileId){
+        Profile profile = findProfile(profileId);
+
+        return new ProfileResponse(profile);
+
+    }
+
+    private Profile findProfile(Long profileId){
         return profileRepository.findById(profileId).orElseThrow(
                 () -> new IllegalArgumentException("존재하지 않는 프로필")
         );
