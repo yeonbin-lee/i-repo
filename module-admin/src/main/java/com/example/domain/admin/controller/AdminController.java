@@ -17,6 +17,9 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.OK).body("aa successfully!");
     }
 
+//    @GetMapping("/manage/user")
+//    public ResponseEntity<?> manageUser()
+
 
 
 

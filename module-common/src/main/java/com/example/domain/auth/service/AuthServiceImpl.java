@@ -14,12 +14,11 @@ import com.example.domain.member.entity.Member;
 import com.example.domain.member.entity.enums.Gender;
 import com.example.domain.member.entity.enums.Provider;
 import com.example.domain.member.entity.enums.Role;
-import com.example.domain.member.service.LogoutService;
-import com.example.domain.member.service.MemberService;
+import com.example.domain.member.service.logoutService.LogoutService;
+import com.example.domain.member.service.memberService.MemberService;
 import com.example.global.config.jwt.CustomUserDetails;
 import com.example.global.config.jwt.JwtTokenProvider;
 import com.example.global.config.jwt.RefreshToken;
-import com.example.global.exception.custom.NotEqualsCodeException;
 import com.example.global.exception.custom.SocialLoginException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
@@ -38,7 +37,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -64,6 +62,7 @@ public class AuthServiceImpl implements AuthService {
     private final LogoutService logoutService;
     private final RedisTemplate<String, Object> redisTemplate;
     private final UUIDUtil uuidUtil;
+//    private final DeletedMemberService deletedMemberService;
 
 
     /** [일반] 이메일 회원가입 API
@@ -102,6 +101,7 @@ public class AuthServiceImpl implements AuthService {
                 .gender(request.getGender())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .birthday(request.getBirthday())
+                .createdAt(LocalDate.now())
                 .role(Role.ROLE_USER)
                 .provider(Provider.NORMAL)
                 .build();
@@ -260,24 +260,6 @@ public class AuthServiceImpl implements AuthService {
         return null;
     }
 
-    public void logout(String accessToken, String email) {
-        String token = accessToken.substring(7);
-        // Redis 내의 기존 refreshToken 삭제
-        if (!refreshTokenService.existsById(email)){
-            // 리프레시 토큰 없다고 예외처리 날려야됨
-        }
-        refreshTokenService.deleteById(email);
-
-        // access_token의 남은 유효시간 가져오기 (Seconds 단위)
-        Date expirationFromToken = jwtTokenProvider.getExpirationFromToken(token);
-        Date today = new Date();
-        Integer sec = (int) ((expirationFromToken.getTime() - today.getTime()) / 1000);
-
-        // accessToken을 Redis의 key 값으로 등록
-        logoutService.logoutUser(token, sec); // "Bearer "삭제
-    }
-
-
     /**
      * [카카오] 발급받은 인가코드로 카카오 액세스 토큰 발급
      * */
@@ -408,7 +390,7 @@ public class AuthServiceImpl implements AuthService {
         LocalDate birth = LocalDate.parse(birth_str, DateTimeFormatter.ISO_DATE);
 
         String password = socialRandomPassword(email);
-        Member member = new Member(newNickname, email, password, phone, Gender.valueOf(gender.toUpperCase()), birth, Role.ROLE_USER, Provider.KAKAO);
+        Member member = new Member(newNickname, email, password, phone, Gender.valueOf(gender.toUpperCase()), birth, LocalDate.now(), Role.ROLE_USER, Provider.KAKAO);
         return member;
     }
 

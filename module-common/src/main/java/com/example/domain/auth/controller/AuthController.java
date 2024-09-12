@@ -112,20 +112,6 @@ public class AuthController {
 
 
     /**
-     * 로그아웃
-     * 1. Redis내의 refresh_token 삭제
-     * 2. Redis에 현재 access_token을 logout 상태로 등록
-     * - 2.1. 해당 access_token의 남은 유효시간을 Redis의 TTL로 등록
-     * 3. JwtTokenFilter 파일의 doFIlterInternal 메소드에서 redis에 logout 상태인지 검증하는 로직 추가
-     * @param request - email
-     * */
-    @DeleteMapping("/logout")
-    public ResponseEntity<?> logout(@RequestHeader("Authorization") String accessToken, @RequestBody LogoutRequest request) {
-        authService.logout(accessToken, request.getEmail());
-        return ResponseEntity.status(HttpStatus.OK).body("User logout!");
-    }
-
-    /**
      * 이메일 찾기 By 전화번호 API
      * @param request phone - 사용자 전화번호
      * @return response - provider, email
@@ -135,6 +121,7 @@ public class AuthController {
         FindEmailResponse response = authService.findEmailByPhone(request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
 
     /**
      * Access 토큰갱신 API

@@ -6,7 +6,7 @@ import com.example.domain.member.controller.dto.request.profile.ProfileRegisterR
 import com.example.domain.member.controller.dto.request.profile.ProfileUpdateRequest;
 import com.example.domain.member.controller.dto.response.ProfileDTO;
 import com.example.domain.member.entity.Profile;
-import com.example.domain.member.service.ProfileService;
+import com.example.domain.member.service.profileService.ProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

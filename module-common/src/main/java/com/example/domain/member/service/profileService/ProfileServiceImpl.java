@@ -1,4 +1,4 @@
-package com.example.domain.member.service;
+package com.example.domain.member.service.profileService;
 
 import com.example.domain.member.controller.dto.request.profile.ProfileDeleteRequest;
 import com.example.domain.member.controller.dto.request.profile.ProfileListRequest;
@@ -8,6 +8,7 @@ import com.example.domain.member.controller.dto.response.ProfileDTO;
 import com.example.domain.member.entity.Member;
 import com.example.domain.member.entity.Profile;
 import com.example.domain.member.repository.ProfileRepository;
+import com.example.domain.member.service.memberService.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;

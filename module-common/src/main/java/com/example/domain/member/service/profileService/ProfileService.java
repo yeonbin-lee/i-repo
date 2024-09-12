@@ -1,4 +1,4 @@
-package com.example.domain.member.service;
+package com.example.domain.member.service.profileService;
 
 import com.example.domain.member.controller.dto.request.profile.ProfileDeleteRequest;
 import com.example.domain.member.controller.dto.request.profile.ProfileListRequest;

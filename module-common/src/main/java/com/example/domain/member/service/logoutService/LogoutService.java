@@ -1,4 +1,4 @@
-package com.example.domain.member.service;
+package com.example.domain.member.service.logoutService;
 
 public interface LogoutService {
 

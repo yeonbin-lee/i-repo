@@ -1,11 +1,13 @@
-package com.example.domain.member.service;
+package com.example.domain.member.service.memberService;
 
-import com.example.domain.auth.service.AuthService;
+import com.example.domain.auth.service.RefreshTokenService;
 import com.example.domain.member.controller.dto.request.member.NicknameChangeRequest;
 import com.example.domain.member.controller.dto.request.member.PwChangeRequest;
 import com.example.domain.member.controller.dto.response.MemberResponse;
 import com.example.domain.member.entity.Member;
 import com.example.domain.member.repository.MemberRepository;
+import com.example.domain.deleted.service.DeletedMemberService;
+import com.example.domain.member.service.logoutService.LogoutService;
 import com.example.global.config.jwt.JwtTokenProvider;
 import com.example.global.exception.custom.NotEqualsPasswordException;
 import com.example.global.exception.custom.UserNotFoundException;
@@ -15,6 +17,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -24,7 +27,9 @@ public class MemberServiceImpl implements MemberService{
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
-    private final AuthService authService;
+    private final RefreshTokenService refreshTokenService;
+    private final LogoutService logoutService;
+    private final DeletedMemberService deletedMemberService;
 
     /** Member 조회 */
     @Override
@@ -33,17 +38,6 @@ public class MemberServiceImpl implements MemberService{
         Member member = findMemberById(findMemberIdByAccessToken(accessToken));
         return new MemberResponse(member);
     }
-
-
-    /** Member 삭제 */
-    @Override
-    @Transactional
-    public void delete(String accessToken) {
-        Member member = findMemberById(findMemberIdByAccessToken(accessToken));
-        memberRepository.delete(member);
-        authService.logout(accessToken, member.getEmail()); // accessToken, RefreshToken 무효화
-    }
-
 
 
     /** 2. 비밀번호 재설정
@@ -65,6 +59,33 @@ public class MemberServiceImpl implements MemberService{
         } else {
             throw new NotEqualsPasswordException("비밀번호가 일치하지 않습니다.");
         }
+    }
+
+    /** Member 삭제 */
+    @Override
+    public void delete(String accessToken) {
+        Member member = findMemberById(findMemberIdByAccessToken(accessToken));
+        deletedMemberService.saveDeletedMember(member);
+        deleteMember(member);
+        logout(accessToken, member.getEmail()); // accessToken, RefreshToken 무효화
+    }
+
+
+    public void logout(String accessToken, String email) {
+        String token = accessToken.substring(7);
+        // Redis 내의 기존 refreshToken 삭제
+        if (!refreshTokenService.existsById(email)){
+            // 리프레시 토큰 없다고 예외처리 날려야됨
+        }
+        refreshTokenService.deleteById(email);
+
+        // access_token의 남은 유효시간 가져오기 (Seconds 단위)
+        Date expirationFromToken = jwtTokenProvider.getExpirationFromToken(token);
+        Date today = new Date();
+        Integer sec = (int) ((expirationFromToken.getTime() - today.getTime()) / 1000);
+
+        // accessToken을 Redis의 key 값으로 등록
+        logoutService.logoutUser(token, sec); // "Bearer "삭제
     }
 
     /** 회원 닉네임 재설정 */
@@ -127,5 +148,9 @@ public class MemberServiceImpl implements MemberService{
         return memberRepository.findByEmailAndPhone(email, phone).orElseThrow(
                 () -> new UserNotFoundException("이메일 정보와 휴대폰 정보가 일치하지 않습니다.")
         );
+    }
+
+    public void deleteMember(Member member){
+        memberRepository.delete(member);
     }
 }

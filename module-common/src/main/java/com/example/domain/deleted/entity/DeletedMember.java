@@ -1,13 +1,11 @@
-package com.example.domain.member.entity;
+package com.example.domain.deleted.entity;
 
 import com.example.domain.member.entity.enums.Gender;
 import com.example.domain.member.entity.enums.Provider;
 import com.example.domain.member.entity.enums.Role;
 import jakarta.persistence.*;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
@@ -15,22 +13,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor
-@Getter
-@Setter
 @Entity
-public class Member {
+@Table(name = "deleted_member")
+public class DeletedMember {
     @Id
-    @Column(name = "member_id")
+    @Column(name = "deleted_member_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
+    @Column
+    private Long member_id; // member에서 사용하는 pk(id)값
+
+//    @Column(unique = true)
     private String email;
 
-    @Column(unique = true)
+//    @Column(unique = true)
     private String nickname;
 
-    @Column(unique = true)
+//    @Column(unique = true)
     private String phone;
 
     @Enumerated(EnumType.STRING)
@@ -43,7 +43,12 @@ public class Member {
     private LocalDate birthday;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Column(name = "created_at")
     private LocalDate createdAt;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Column(name = "cancelled_at")
+    private LocalDate cancelledAt;
 
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -51,32 +56,22 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Provider provider;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Profile> profiles = new ArrayList<Profile>();
-
-//    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-//    private List<MemberTerm> memberTerms;
-
+    @OneToMany(mappedBy = "deletedMember", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DeletedProfile> deletedProfiles = new ArrayList<DeletedProfile>();
 
     @Builder
-    public Member(String nickname, String email, String password, String phone, Gender gender, LocalDate birthday, LocalDate createdAt, Role role, Provider provider) {
+    public DeletedMember(Long member_id, String email, String nickname, String phone, Gender gender, String password, LocalDate birthday,
+                         LocalDate createdAt, LocalDate cancelledAt, Role role, Provider provider) {
+        this.member_id = member_id;
+        this.email= email;
         this.nickname = nickname;
-        this.email = email;
-        this.password = password;
         this.phone = phone;
         this.gender = gender;
-        this.createdAt = createdAt;
+        this.password = password;
         this.birthday = birthday;
+        this.createdAt = createdAt;
+        this.cancelledAt = cancelledAt;
         this.role = role;
         this.provider = provider;
     }
-
-    public void updatePhone(String phone) {this.phone = phone;}
-    public void updatePassword(String password){
-        this.password = password;
-    }
-    public void updateNickname(String nickname){
-        this.nickname = nickname;
-    }
-//    public void updateCancelledAt(){this.cancelledAt = cancelledAt; }
 }

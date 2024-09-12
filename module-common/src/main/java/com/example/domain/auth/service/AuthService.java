@@ -23,7 +23,5 @@ public interface AuthService {
 
     public String refreshAccessToken(String refreshToken, RefreshRequest request);
 
-    public void logout(String accessToken, String email);
-
     public LoginResponse loginByKakao(String token);
 }

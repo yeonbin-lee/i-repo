@@ -12,7 +12,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 @RequiredArgsConstructor
-@EnableRedisRepositories(basePackages = "com.example.common_module") // Redis 레포지토리 기능 활성화
+@EnableRedisRepositories(basePackages = "com.example") // Redis 레포지토리 기능 활성화
 public class RedisConfig {
     private final RedisProperties redisProperties; // Redis 속성 정보 주입
 
