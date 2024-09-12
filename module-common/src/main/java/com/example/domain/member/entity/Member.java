@@ -16,7 +16,6 @@ import java.util.List;
 
 @NoArgsConstructor
 @Getter
-@Setter
 @Entity
 public class Member {
     @Id
@@ -43,6 +42,7 @@ public class Member {
     private LocalDate birthday;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Column(name = "created_at")
     private LocalDate createdAt;
 
     @Enumerated(EnumType.STRING)

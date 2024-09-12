@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class DeletedMemberServiceImpl implements DeletedMemberService {
 
@@ -33,8 +34,9 @@ public class DeletedMemberServiceImpl implements DeletedMemberService {
     }
 
     private DeletedMember convertMemberToDeletedMember(Member member){
+
         return DeletedMember.builder()
-                .member_id(member.getId())
+                .member_code(member.getId())
                 .email(member.getEmail())
                 .nickname(member.getNickname())
                 .phone(member.getPhone())
@@ -52,6 +54,7 @@ public class DeletedMemberServiceImpl implements DeletedMemberService {
         // 프로필 변환 로직
         return DeletedProfile.builder()
                 .deletedMember(deletedMember)
+                .profile_id(profile.getId())
                 .nickname(profile.getNickname())
                 .gender(profile.getGender())
                 .birthday(profile.getBirthday())

@@ -16,7 +16,6 @@ import static jakarta.persistence.FetchType.LAZY;
 
 @NoArgsConstructor
 @Getter
-@Setter
 @Entity
 @Table(name = "deleted_profile")
 public class DeletedProfile {
@@ -30,6 +29,9 @@ public class DeletedProfile {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "deleted_member_id")
     private DeletedMember deletedMember;
+
+    @Column
+    private Long profile_id; // 기존 profile_id
 
     @Column
     private String nickname;
@@ -56,9 +58,10 @@ public class DeletedProfile {
     private Choice diabetes;
 
     @Builder
-    public DeletedProfile(DeletedMember deletedMember, String nickname, Gender gender, LocalDate birthday, Boolean owner
+    public DeletedProfile(DeletedMember deletedMember, Long profile_id,String nickname, Gender gender, LocalDate birthday, Boolean owner
             , Choice pregnancy, Choice smoking, Choice hypertension, Choice diabetes) {
         this.deletedMember = deletedMember;
+        this.profile_id = profile_id;
         this.nickname = nickname;
         this.gender = gender;
         this.birthday = birthday;

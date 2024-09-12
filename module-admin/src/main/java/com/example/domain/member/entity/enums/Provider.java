@@ -1,4 +1,4 @@
-package com.example.domain.entity.enums;
+package com.example.domain.member.entity.enums;
 
 
 import lombok.Getter;

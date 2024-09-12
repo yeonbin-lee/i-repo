@@ -1,6 +1,6 @@
 package com.example.global.config.jwt;
 
-import com.example.domain.entity.Member;
+import com.example.domain.member.entity.Member;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

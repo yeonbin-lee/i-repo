@@ -1,8 +1,8 @@
-package com.example.domain.entity;
+package com.example.domain.member.entity;
 
-import com.example.domain.entity.enums.Gender;
-import com.example.domain.entity.enums.Provider;
-import com.example.domain.entity.enums.Role;
+import com.example.domain.member.entity.enums.Gender;
+import com.example.domain.member.entity.enums.Provider;
+import com.example.domain.member.entity.enums.Role;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,7 +22,7 @@ public class Member {
 
     @Id
     @Column(name = "member_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true)
@@ -43,6 +43,10 @@ public class Member {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthday;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Column(name = "created_at")
+    private LocalDate createdAt;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
@@ -57,13 +61,15 @@ public class Member {
 
 
     @Builder
-    public Member(String nickname, String email, String password, String phone, Gender gender, LocalDate birthday, Role role, Provider provider) {
+    public Member(Long id, String nickname, String email, String password, String phone, Gender gender, LocalDate birthday, LocalDate createdAt, Role role, Provider provider) {
+        this.id = id;
         this.nickname = nickname;
         this.email = email;
         this.password = password;
         this.phone = phone;
         this.gender = gender;
         this.birthday = birthday;
+        this.createdAt = createdAt;
         this.role = role;
         this.provider = provider;
     }

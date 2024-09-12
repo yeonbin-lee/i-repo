@@ -1,7 +1,7 @@
-package com.example.domain.entity;
+package com.example.domain.member.entity;
 
-import com.example.domain.entity.enums.Choice;
-import com.example.domain.entity.enums.Gender;
+import com.example.domain.member.entity.enums.Choice;
+import com.example.domain.member.entity.enums.Gender;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -22,7 +22,7 @@ public class Profile {
 
     @Id
     @Column(name = "profile_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @JsonIgnore
@@ -55,8 +55,9 @@ public class Profile {
     private Choice diabetes;
 
     @Builder
-    public Profile(Member member, String nickname, Gender gender, LocalDate birthday, Boolean owner
+    public Profile(Long id, Member member, String nickname, Gender gender, LocalDate birthday, Boolean owner
             , Choice pregnancy, Choice smoking, Choice hypertension, Choice diabetes) {
+        this.id = id;
         this.member = member;
         this.nickname = nickname;
         this.gender = gender;
