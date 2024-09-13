@@ -8,6 +8,7 @@ import com.example.domain.member.controller.dto.response.ProfileDTO;
 import com.example.domain.member.controller.dto.response.ProfileResponse;
 import com.example.domain.member.entity.Member;
 import com.example.domain.member.entity.Profile;
+import com.example.domain.member.entity.enums.Choice;
 import com.example.domain.member.repository.ProfileRepository;
 import com.example.domain.member.service.memberService.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,27 @@ public class ProfileServiceImpl implements ProfileService{
     private final MemberService memberService;
 
     /**
-     * 프로필 등록
+     * 기본 프로필 등록
+     */
+    @Override
+    public void registerMainProfile(Member member) {
+        Profile mainProfile = Profile.builder()
+                .member(member)
+                .nickname(member.getNickname())
+                .gender(member.getGender())
+                .birthday(member.getBirthday())
+                .owner(true)
+                .pregnancy(Choice.UNKNOWN)
+                .smoking(Choice.UNKNOWN)
+                .hypertension(Choice.UNKNOWN)
+                .diabetes(Choice.UNKNOWN)
+                .build();
+        saveProfile(mainProfile);
+    }
+
+
+    /**
+     * 추가 프로필 등록
      * */
     @Override
     public void registerProfile(ProfileRegisterRequest request) {
@@ -38,12 +59,12 @@ public class ProfileServiceImpl implements ProfileService{
             throw new DataIntegrityViolationException("최대 프로필 개수는 10개 입니다.");
         }
 
-        // 기본 프로필 존재 여부 확인 (1개만 가능)
-        if(request.getOwner() == true){
-            if(profileRepository.countProfilesWithOwnerTrue() > 0){
-                throw new DataIntegrityViolationException("이미 기본 프로필이 존재합니다.");
-            }
-        }
+//        // 기본 프로필 존재 여부 확인 (1개만 가능)
+//        if(request.getOwner() == true){
+//            if(profileRepository.countProfilesWithOwnerTrue() > 0){
+//                throw new DataIntegrityViolationException("이미 기본 프로필이 존재합니다.");
+//            }
+//        }
 
         // 중복 닉네임 체크
         if(profiles.stream()
@@ -56,7 +77,7 @@ public class ProfileServiceImpl implements ProfileService{
                 .nickname(request.getNickname())
                 .gender(request.getGender())
                 .birthday(request.getBirthday())
-                .owner(request.getOwner())
+                .owner(false)
                 .pregnancy(request.getPregnancy())
                 .smoking(request.getSmoking())
                 .hypertension(request.getHypertension())

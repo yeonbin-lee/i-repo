@@ -38,7 +38,8 @@ public class AdminFilter implements GatewayFilter {
 
         String token = authorizationHeader.substring(7);
         String role = jwtUtil.getRole(token);
-        if (!"ROLE_ADMIN".equals(role) || !"ROLE_SUPER_ADMIN".equals(role)) {
+        System.out.println("role=" + role);
+        if (!"ROLE_ADMIN".equals(role) && !"ROLE_SUPER_ADMIN".equals(role)) {
             exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
             return exchange.getResponse().setComplete();
         }

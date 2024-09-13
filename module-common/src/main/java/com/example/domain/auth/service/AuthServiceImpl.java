@@ -16,6 +16,7 @@ import com.example.domain.member.entity.enums.Provider;
 import com.example.domain.member.entity.enums.Role;
 import com.example.domain.member.service.logoutService.LogoutService;
 import com.example.domain.member.service.memberService.MemberService;
+import com.example.domain.member.service.profileService.ProfileService;
 import com.example.global.config.jwt.CustomUserDetails;
 import com.example.global.config.jwt.JwtTokenProvider;
 import com.example.global.config.jwt.RefreshToken;
@@ -55,6 +56,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final SmsService smsService;
     private final MemberService memberService;
+    private final ProfileService profileService;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
@@ -105,6 +107,9 @@ public class AuthServiceImpl implements AuthService {
                 .role(Role.ROLE_USER)
                 .provider(Provider.NORMAL)
                 .build();
+
+        // 기본 프로필 등록
+        profileService.registerMainProfile(member);
 
         // SAVE MEMBER ENTITY
         memberService.saveMember(member);

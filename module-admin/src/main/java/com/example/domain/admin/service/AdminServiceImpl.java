@@ -7,6 +7,7 @@ import com.example.domain.deleted.repository.DeletedMemberRepository;
 import com.example.domain.member.entity.Member;
 import com.example.domain.member.entity.Profile;
 import com.example.domain.member.repository.MemberRepository;
+import com.example.domain.member.repository.MemberSpecification;
 import com.example.domain.member.repository.ProfileRepository;
 import com.example.domain.member.service.MemberService;
 import com.example.domain.member.service.ProfileService;
@@ -14,8 +15,10 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -25,6 +28,7 @@ public class AdminServiceImpl implements AdminService{
     private final DeletedMemberRepository deletedMemberRepository;
     private final MemberService memberService;
     private final ProfileService profileService;
+    private final MemberRepository memberRepository;
 
     @Transactional
     @Override
@@ -41,6 +45,34 @@ public class AdminServiceImpl implements AdminService{
             profileService.saveProfile(convertDeletedProfileToProfile(member, deletedProfile));
         }
         deletedMemberRepository.delete(deletedMember);
+    }
+
+    public List<Member> searchMembers(LocalDate startDate, LocalDate endDate, boolean isBirthDayFilter, Long memberId, String email, String nickname, String gender) {
+        Specification<Member> spec = Specification.where(null);
+
+        Profile mainProfile = profileService.findMainProfile(memberId);
+
+        // 날짜 필터 (생년월일 또는 회원 가입일)
+        if (startDate != null && endDate != null) {
+            if (isBirthDayFilter) {
+                spec = spec.and(MemberSpecification.betweenBirthDay(startDate, endDate)); // 생년월일 기준 필터
+            } else {
+                spec = spec.and(MemberSpecification.betweenCreatedAt(startDate, endDate)); // 회원 가입일 기준 필터
+            }
+        }
+
+        // 검색 조건 (회원번호, 이메일, 닉네임, 성별 중 하나)
+        if (memberId != null) {
+            spec = spec.and(MemberSpecification.hasMemberId(memberId));
+        } else if (email != null && !email.isEmpty()) {
+            spec = spec.and(MemberSpecification.hasEmail(email));
+        } else if (nickname != null && !nickname.isEmpty()) {
+            spec = spec.and(MemberSpecification.hasNickname(nickname));
+        } else if (gender != null && !gender.isEmpty()) {
+            spec = spec.and(MemberSpecification.hasGender(gender));
+        }
+        return memberRepository.findAll(spec);
+
     }
 
 

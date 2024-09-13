@@ -15,8 +15,6 @@ public class ProfileRegisterRequest {
 
     private Gender gender;
 
-    private Boolean owner;
-
     private LocalDate birthday;
 
     private Choice pregnancy;
