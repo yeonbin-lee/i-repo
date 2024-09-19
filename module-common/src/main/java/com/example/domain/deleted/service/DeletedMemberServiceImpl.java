@@ -2,6 +2,7 @@ package com.example.domain.deleted.service;
 
 import com.example.domain.deleted.entity.DeletedMember;
 import com.example.domain.deleted.entity.DeletedProfile;
+import com.example.domain.deleted.entity.enums.ResignationReason;
 import com.example.domain.deleted.repository.DeletedMemberRepository;
 import com.example.domain.deleted.repository.DeletedProfileRepository;
 import com.example.domain.member.entity.Member;
@@ -10,6 +11,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -23,9 +25,10 @@ public class DeletedMemberServiceImpl implements DeletedMemberService {
     private final DeletedProfileRepository deletedProfileRepository;
 
     @Override
-    public void saveDeletedMember(Member member){
+    public void saveDeletedMember(Member member, ResignationReason reason){
 
         DeletedMember deletedMember = convertMemberToDeletedMember(member);
+        deletedMember.setResignationReason(reason);
         deletedMemberRepository.save(deletedMember);
 
         for (Profile profile : member.getProfiles()) {

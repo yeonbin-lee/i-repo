@@ -1,6 +1,7 @@
 package com.example.domain.member.controller;
 
 import com.example.domain.auth.controller.dto.request.LogoutRequest;
+import com.example.domain.deleted.entity.enums.ResignationReason;
 import com.example.domain.member.controller.dto.request.member.NicknameChangeRequest;
 import com.example.domain.member.controller.dto.request.member.PwChangeRequest;
 import com.example.domain.member.controller.dto.response.MemberResponse;
@@ -43,8 +44,8 @@ public class MemberController {
      * 회원정보 삭제 API
      * */
     @DeleteMapping("/delete")
-    public ResponseEntity<?> deleteUser(@RequestHeader("Authorization") String accessToken) {
-        memberService.delete(accessToken);
+    public ResponseEntity<?> deleteUser(@RequestHeader("Authorization") String accessToken, @RequestParam ResignationReason reason) {
+        memberService.delete(accessToken, reason);
         return ResponseEntity.status(HttpStatus.OK).body("User deleted successfully");
     }
 

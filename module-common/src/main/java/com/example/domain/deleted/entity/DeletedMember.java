@@ -1,5 +1,7 @@
 package com.example.domain.deleted.entity;
 
+import com.example.domain.deleted.entity.enums.ResignationReason;
+import com.example.domain.member.entity.Profile;
 import com.example.domain.member.entity.enums.Gender;
 import com.example.domain.member.entity.enums.Provider;
 import com.example.domain.member.entity.enums.Role;
@@ -62,9 +64,12 @@ public class DeletedMember {
     @OneToMany(mappedBy = "deletedMember", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DeletedProfile> deletedProfiles = new ArrayList<DeletedProfile>();
 
+    @Enumerated(EnumType.STRING) // Enum을 사용할 경우
+    private ResignationReason resignationReason;
+
     @Builder
     public DeletedMember(Long member_code, String email, String nickname, String phone, Gender gender, String password, LocalDate birthday,
-                         LocalDate createdAt, LocalDate cancelledAt, Role role, Provider provider) {
+                         LocalDate createdAt, LocalDate cancelledAt, Role role, Provider provider/*, ResignationReason reason*/) {
         this.member_code = member_code;
         this.email= email;
         this.nickname = nickname;
@@ -76,5 +81,11 @@ public class DeletedMember {
         this.cancelledAt = cancelledAt;
         this.role = role;
         this.provider = provider;
+//        this.resignationReason = reason;
     }
+
+    public void setResignationReason(ResignationReason reason) {
+        this.resignationReason = reason;
+    }
+
 }

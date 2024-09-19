@@ -1,5 +1,6 @@
 package com.example.domain.member.service.memberService;
 
+import com.example.domain.deleted.entity.enums.ResignationReason;
 import com.example.domain.member.controller.dto.request.member.NicknameChangeRequest;
 import com.example.domain.member.controller.dto.request.member.PwChangeRequest;
 import com.example.domain.member.controller.dto.response.MemberResponse;
@@ -24,6 +25,6 @@ public interface MemberService {
     public Member findMemberById(Long memberId);
     public Long findMemberIdByAccessToken(String accessToken);
     public void deleteMember(Member member);
-    public void delete(String accessToken);
+    public void delete(String accessToken, ResignationReason reason);
     public void logout(String accessToken, String email);
 }

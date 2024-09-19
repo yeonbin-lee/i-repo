@@ -1,6 +1,7 @@
 package com.example.domain.member.service.memberService;
 
 import com.example.domain.auth.service.RefreshTokenService;
+import com.example.domain.deleted.entity.enums.ResignationReason;
 import com.example.domain.member.controller.dto.request.member.NicknameChangeRequest;
 import com.example.domain.member.controller.dto.request.member.PwChangeRequest;
 import com.example.domain.member.controller.dto.response.MemberResponse;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Date;
 import java.util.Optional;
@@ -63,10 +65,10 @@ public class MemberServiceImpl implements MemberService{
 
     /** Member 삭제 */
     @Override
-    public void delete(String accessToken) {
+    public void delete(String accessToken, ResignationReason reason) {
         Member member = findMemberById(findMemberIdByAccessToken(accessToken));
-        deletedMemberService.saveDeletedMember(member);
-        deleteMember(member);
+        deletedMemberService.saveDeletedMember(member, reason);
+        deleteMember(member); // member 엔티티에서 삭제
         logout(accessToken, member.getEmail()); // accessToken, RefreshToken 무효화
     }
 

@@ -4,7 +4,6 @@ import com.example.domain.admin.controller.dto.response.FilterResponse;
 import com.example.domain.member.entity.Member;
 
 public class MemberMapper {
-
     public static FilterResponse toFilterResponse(Member member) {
         FilterResponse response = new FilterResponse();
         response.setMember_id(member.getId().toString());
