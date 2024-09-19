@@ -54,6 +54,8 @@ public class Profile {
     @Enumerated(EnumType.STRING)
     private Choice diabetes;
 
+
+
     @Builder
     public Profile(Member member, String nickname, Gender gender, LocalDate birthday, Boolean owner
             , Choice pregnancy, Choice smoking, Choice hypertension, Choice diabetes) {

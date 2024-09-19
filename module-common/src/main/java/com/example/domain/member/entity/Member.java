@@ -7,7 +7,6 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
@@ -51,8 +50,14 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Provider provider;
 
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "default_profile_id")
+    private Profile defaultProfile;
+
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Profile> profiles = new ArrayList<Profile>();
+
+
 
 //    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
 //    private List<MemberTerm> memberTerms;
@@ -79,4 +84,9 @@ public class Member {
         this.nickname = nickname;
     }
 //    public void updateCancelledAt(){this.cancelledAt = cancelledAt; }
+
+    // 기본 프로필 설정 메서드
+    public void setDefaultProfile(Profile defaultProfile) {
+        this.defaultProfile = defaultProfile;
+    }
 }

@@ -20,11 +20,11 @@ public class ProfileServiceImpl implements ProfileService {
         profileRepository.save(profile);
     }
 
-    @Override
-    public Profile findMainProfile(Long memberId){
-        Optional<Profile> profile = profileRepository.findByMemberIdAndOwner(memberId);
-        if (profile == null) {
-            return null;
-        } return profile.get();
-    }
+//    @Override
+//    public Profile findMainProfile(Long memberId){
+//        Optional<Profile> profile = profileRepository.findByMemberIdAndOwner(memberId);
+//        if (profile == null) {
+//            return null;
+//        } return profile.get();
+//    }
 }

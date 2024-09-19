@@ -9,14 +9,14 @@ import java.util.Optional;
 
 @Repository
 public interface ProfileRepository extends JpaRepository<Profile, Long> {
-
-    @Query("SELECT COUNT(p) FROM Profile p WHERE p.owner = true")
-    Long countProfilesWithOwnerTrue();
-
-    @Query("SELECT COUNT(p) FROM Profile p")
-    Long countAllProfiles();
-
-    @Query("SELECT p FROM Profile p where p.member.id=:memberId AND p.owner =: true")
-    Optional<Profile> findByMemberIdAndOwner(Long memberId);
+//
+//    @Query("SELECT COUNT(p) FROM Profile p WHERE p.owner = true")
+//    Long countProfilesWithOwnerTrue();
+//
+//    @Query("SELECT COUNT(p) FROM Profile p")
+//    Long countAllProfiles();
+//
+//    @Query("SELECT p FROM Profile p where p.member.id=:memberId AND p.owner =: true")
+//    Optional<Profile> findByMemberIdAndOwner(Long memberId);
 }
 

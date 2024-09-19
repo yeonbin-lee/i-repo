@@ -30,18 +30,20 @@ public class ProfileServiceImpl implements ProfileService{
      */
     @Override
     public void registerMainProfile(Member member) {
-        Profile mainProfile = Profile.builder()
+        Profile defaultProfile = Profile.builder()
                 .member(member)
+                .owner(true)
                 .nickname(member.getNickname())
                 .gender(member.getGender())
                 .birthday(member.getBirthday())
-                .owner(true)
                 .pregnancy(Choice.UNKNOWN)
                 .smoking(Choice.UNKNOWN)
                 .hypertension(Choice.UNKNOWN)
                 .diabetes(Choice.UNKNOWN)
                 .build();
-        saveProfile(mainProfile);
+        saveProfile(defaultProfile);
+
+        member.setDefaultProfile(defaultProfile);
     }
 
 
@@ -54,17 +56,10 @@ public class ProfileServiceImpl implements ProfileService{
         Member member = memberService.findByEmail(request.getEmail());
         List<Profile> profiles = member.getProfiles();
 
-        // 프로필 개수 확인 (최대 10개 가능)
-        if(profileRepository.countAllProfiles() > 10) {
+        // 프로필 개수 확인 ((메인 + 추가) 최대 10개 가능)
+        if(profileRepository.countAllProfiles() > 9) {
             throw new DataIntegrityViolationException("최대 프로필 개수는 10개 입니다.");
         }
-
-//        // 기본 프로필 존재 여부 확인 (1개만 가능)
-//        if(request.getOwner() == true){
-//            if(profileRepository.countProfilesWithOwnerTrue() > 0){
-//                throw new DataIntegrityViolationException("이미 기본 프로필이 존재합니다.");
-//            }
-//        }
 
         // 중복 닉네임 체크
         if(profiles.stream()
@@ -74,10 +69,10 @@ public class ProfileServiceImpl implements ProfileService{
 
         Profile profile = Profile.builder()
                 .member(member)
+                .owner(false)
                 .nickname(request.getNickname())
                 .gender(request.getGender())
                 .birthday(request.getBirthday())
-                .owner(false)
                 .pregnancy(request.getPregnancy())
                 .smoking(request.getSmoking())
                 .hypertension(request.getHypertension())

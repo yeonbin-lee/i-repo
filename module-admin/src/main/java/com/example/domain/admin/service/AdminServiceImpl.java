@@ -1,17 +1,17 @@
 package com.example.domain.admin.service;
 
-import com.example.domain.admin.controller.dto.RestoreRequest;
+import com.example.domain.admin.controller.dto.request.RestoreRequest;
+import com.example.domain.admin.controller.dto.response.FilterResponse;
 import com.example.domain.deleted.entity.DeletedMember;
 import com.example.domain.deleted.entity.DeletedProfile;
 import com.example.domain.deleted.repository.DeletedMemberRepository;
 import com.example.domain.member.entity.Member;
 import com.example.domain.member.entity.Profile;
+import com.example.domain.member.mapper.MemberMapper;
 import com.example.domain.member.repository.MemberRepository;
 import com.example.domain.member.repository.MemberSpecification;
-import com.example.domain.member.repository.ProfileRepository;
 import com.example.domain.member.service.MemberService;
 import com.example.domain.member.service.ProfileService;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -20,11 +20,11 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class AdminServiceImpl implements AdminService{
-
     private final DeletedMemberRepository deletedMemberRepository;
     private final MemberService memberService;
     private final ProfileService profileService;
@@ -34,45 +34,43 @@ public class AdminServiceImpl implements AdminService{
     @Override
     public void restoreMember(RestoreRequest request){
 
-//        DeletedMember deletedMember = deletedMemberRepository.findById(request.getId()).get();
-
         DeletedMember deletedMember = findByIdWithProfiles(request.getDeletedMemberId());
 
         List<DeletedProfile> deletedProfiles = deletedMember.getDeletedProfiles();
         Member member = convertDeletedMemberToMember(deletedMember);
         memberService.saveMember(member);
         for (DeletedProfile deletedProfile : deletedMember.getDeletedProfiles()) {
-            profileService.saveProfile(convertDeletedProfileToProfile(member, deletedProfile));
+            Profile profile = convertDeletedProfileToProfile(member, deletedProfile);
+            profileService.saveProfile(profile);
+
+            if(profile.getOwner() == true) {
+                member.setDefaultProfile(profile);
+                memberService.saveMember(member);
+            }
+
         }
         deletedMemberRepository.delete(deletedMember);
     }
 
-    public List<Member> searchMembers(LocalDate startDate, LocalDate endDate, boolean isBirthDayFilter, Long memberId, String email, String nickname, String gender) {
+
+    public List<FilterResponse> searchMembers(String field, Object value, String profileField, Object profileValue, LocalDate startDate, LocalDate endDate, String dateField) {
         Specification<Member> spec = Specification.where(null);
 
-        Profile mainProfile = profileService.findMainProfile(memberId);
-
-        // 날짜 필터 (생년월일 또는 회원 가입일)
-        if (startDate != null && endDate != null) {
-            if (isBirthDayFilter) {
-                spec = spec.and(MemberSpecification.betweenBirthDay(startDate, endDate)); // 생년월일 기준 필터
-            } else {
-                spec = spec.and(MemberSpecification.betweenCreatedAt(startDate, endDate)); // 회원 가입일 기준 필터
-            }
+        if (value != null) {
+            spec = spec.and(MemberSpecification.filterByField(field, value));
         }
 
-        // 검색 조건 (회원번호, 이메일, 닉네임, 성별 중 하나)
-        if (memberId != null) {
-            spec = spec.and(MemberSpecification.hasMemberId(memberId));
-        } else if (email != null && !email.isEmpty()) {
-            spec = spec.and(MemberSpecification.hasEmail(email));
-        } else if (nickname != null && !nickname.isEmpty()) {
-            spec = spec.and(MemberSpecification.hasNickname(nickname));
-        } else if (gender != null && !gender.isEmpty()) {
-            spec = spec.and(MemberSpecification.hasGender(gender));
+        if (profileValue != null) {
+            spec = spec.and(MemberSpecification.filterByProfileField(profileField, profileValue));
         }
-        return memberRepository.findAll(spec);
 
+        if (startDate != null && endDate != null && dateField != null) {
+            spec = spec.and(MemberSpecification.filterByDateRange(dateField, startDate, endDate));
+        }
+        List<Member> members = memberRepository.findAll(spec);
+        return members.stream()
+                .map(MemberMapper::toFilterResponse)
+                .collect(Collectors.toList());
     }
 
 
@@ -98,6 +96,7 @@ public class AdminServiceImpl implements AdminService{
     }
 
     private Profile convertDeletedProfileToProfile(Member member, DeletedProfile deletedProfile) {
+
         return Profile.builder()
                 .id(deletedProfile.getProfile_id())
                 .member(member)

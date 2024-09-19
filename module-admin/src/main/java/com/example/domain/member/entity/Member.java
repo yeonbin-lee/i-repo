@@ -22,7 +22,7 @@ public class Member {
 
     @Id
     @Column(name = "member_id")
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true)
@@ -53,6 +53,10 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Provider provider;
 
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "default_profile_id")
+    private Profile defaultProfile;
+
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Profile> profiles = new ArrayList<Profile>();
 
@@ -80,6 +84,11 @@ public class Member {
     }
     public void updateNickname(String nickname){
         this.nickname = nickname;
+    }
+
+    // 기본 프로필 설정 메서드
+    public void setDefaultProfile(Profile defaultProfile) {
+        this.defaultProfile = defaultProfile;
     }
 
 }

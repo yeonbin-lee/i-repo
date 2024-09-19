@@ -1,9 +1,9 @@
 package com.example.domain.admin.controller;
 
-import com.example.domain.admin.controller.dto.RestoreRequest;
+import com.example.domain.admin.controller.dto.request.RestoreRequest;
+import com.example.domain.admin.controller.dto.response.FilterResponse;
 import com.example.domain.admin.service.AdminService;
 import com.example.domain.member.entity.Member;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,24 +41,21 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.OK).body("User Restored Successfully!");
     }
 
-    @GetMapping("/members")
-    public ResponseEntity<?> getMembers(
+    @GetMapping("/search")
+    public ResponseEntity<List<FilterResponse>> searchMembers(
+            @RequestParam(required = false) String field,
+            @RequestParam(required = false) Object value,
+            @RequestParam(required = false) String profileField,
+            @RequestParam(required = false) Object profileValue,
             @RequestParam(required = false) LocalDate startDate,
             @RequestParam(required = false) LocalDate endDate,
-            @RequestParam(required = false, defaultValue = "false") boolean isBirthDayFilter, // 생년월일 또는 회원가입일 필터 선택
-            @RequestParam(required = false) Long memberId,
-            @RequestParam(required = false) String email,
-            @RequestParam(required = false) String nickname,
-            @RequestParam(required = false) String gender) {
+            @RequestParam(required = false) String dateField
+    ) {
+        System.out.println("field=" + field);
+        System.out.println("value=" + value);
 
-        System.out.println(startDate);
-        System.out.println(endDate);
-        System.out.println(isBirthDayFilter);
-        System.out.println(memberId);
-        List<Member> members = adminService.searchMembers(startDate, endDate, isBirthDayFilter, memberId, email, nickname, gender);
-//          return ResponseEntity.status(HttpStatus.OK).body("흠?");
-//        return adminService.searchMembers(startDate, endDate, isBirthDayFilter, memberId, email, nickname, gender);
-        return ResponseEntity.status(HttpStatus.OK).body(members);
+        List<FilterResponse> responses = adminService.searchMembers(field, value, profileField, profileValue, startDate, endDate, dateField);
+        return ResponseEntity.ok(responses);
     }
 
 
