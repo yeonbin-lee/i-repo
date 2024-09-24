@@ -1,9 +1,10 @@
 package com.example.domain.deleted.repository;
 
-import com.example.domain.deleted.entity.DeletedProfile;
+import com.example.domain.deleted.entity.Restore;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface DeletedProfileRepository extends JpaRepository<DeletedProfile, Long> {
+public interface RestoreRepository extends JpaRepository<Restore, Long> {
+
 }

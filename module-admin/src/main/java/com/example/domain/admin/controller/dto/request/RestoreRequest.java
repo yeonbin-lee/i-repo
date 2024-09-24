@@ -5,4 +5,8 @@ import lombok.Getter;
 @Getter
 public class RestoreRequest {
     private Long deletedMemberId;
+
+    private String reason; // 복구 사유
+
+
 }

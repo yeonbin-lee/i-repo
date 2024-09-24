@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public interface DeletedMemberRepository extends JpaRepository<DeletedMember, Long>, JpaSpecificationExecutor<DeletedMember> {
 
     List<DeletedMember> findByCancelledAtBefore(LocalDate date);
