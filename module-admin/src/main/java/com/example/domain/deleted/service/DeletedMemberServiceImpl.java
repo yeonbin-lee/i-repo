@@ -3,10 +3,8 @@ package com.example.domain.deleted.service;
 import com.example.domain.admin.controller.dto.request.RestoreRequest;
 import com.example.domain.deleted.entity.DeletedMember;
 import com.example.domain.deleted.entity.DeletedProfile;
-import com.example.domain.deleted.entity.Restore;
 import com.example.domain.deleted.repository.DeletedMemberRepository;
 import com.example.domain.deleted.repository.DeletedProfileRepository;
-import com.example.domain.deleted.repository.RestoreRepository;
 import com.example.domain.member.entity.Member;
 import com.example.domain.member.service.MemberService;
 import com.example.domain.member.service.ProfileService;
@@ -16,7 +14,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -26,7 +23,8 @@ public class DeletedMemberServiceImpl implements DeletedMemberService{
     private final MemberService memberService;
     private final DeletedMemberRepository deletedMemberRepository;
     private final ProfileService profileService;
-    private final RestoreRepository restoreRepository; // 여기서만 사용할거라 따로 service 클래스 사용X
+
+    private final DeletedProfileRepository deletedProfileRepository;
 
     @Override
     @Transactional
@@ -45,18 +43,15 @@ public class DeletedMemberServiceImpl implements DeletedMemberService{
             profileService.convertDeletedProfileToProfile(member, deletedProfile);
         }
         memberService.saveMember(member);
-
-        Restore restore = Restore.builder()
-                .id(member.getId())
-                .email(member.getEmail())
-                .date(LocalDate.now())
-                .reason(request.getReason())
-                .build();
-        restoreRepository.save(restore);
         deleteDeletedMember(deletedMember);
     }
 
-
+//    @Transactional
+//    public DeletedMember findMemberWithProfilesById(Long id) {
+//        return deletedMemberRepository.findMemberWithProfilesById(id).orElseThrow(
+//                () -> new NotFoundException("₩ 문제")
+//        );
+//    }
 
     @Transactional
     public DeletedMember findDeletedMemberByIdFetch(Long id) {
