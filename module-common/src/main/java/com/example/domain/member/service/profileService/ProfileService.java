@@ -30,5 +30,6 @@ public interface ProfileService {
 
     // 회원 가입시 기본 프로필 등록
     public void registerMainProfile(Member member);
+
 }
 

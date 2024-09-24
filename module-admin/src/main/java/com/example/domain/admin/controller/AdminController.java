@@ -1,9 +1,14 @@
 package com.example.domain.admin.controller;
 
 import com.example.domain.admin.controller.dto.request.RestoreRequest;
+import com.example.domain.admin.controller.dto.response.DeletedFilterResponse;
 import com.example.domain.admin.controller.dto.response.FilterResponse;
 import com.example.domain.admin.service.AdminService;
+import com.example.domain.deleted.entity.DeletedMember;
+import com.example.domain.deleted.repository.DeletedMemberRepository;
+import com.example.domain.deleted.service.DeletedMemberService;
 import com.example.domain.member.entity.Member;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +24,8 @@ import java.util.List;
 public class AdminController {
 
     private final AdminService adminService;
+    private final DeletedMemberService deletedMemberService;
+    private final DeletedMemberRepository deletedMemberRepository;
 
     // 테스팅 용도
     @PostMapping("/aa")
@@ -34,14 +41,17 @@ public class AdminController {
     /**
      * 계정, 프로필 복구 API
      */
-
-    @PostMapping("/member/restore")
+    @DeleteMapping("/member/restore")
     private ResponseEntity<?> restoreMember(@RequestBody RestoreRequest request){
-        adminService.restoreMember(request);
+        deletedMemberService.restoreMember(request);
+//        adminService.restoreMember(request);
         return ResponseEntity.status(HttpStatus.OK).body("User Restored Successfully!");
     }
 
-    @GetMapping("/search")
+    /**
+     * admin - 회원 조회
+     * */
+    @GetMapping("/search/member")
     public ResponseEntity<List<FilterResponse>> searchMembers(
             @RequestParam(required = false) String field,
             @RequestParam(required = false) Object value,
@@ -51,15 +61,28 @@ public class AdminController {
             @RequestParam(required = false) LocalDate endDate,
             @RequestParam(required = false) String dateField
     ) {
-        System.out.println("field=" + field);
-        System.out.println("value=" + value);
 
         List<FilterResponse> responses = adminService.searchMembers(field, value, profileField, profileValue, startDate, endDate, dateField);
         return ResponseEntity.ok(responses);
     }
 
+    /**
+     * admin - 탈퇴 회원 조회
+     * */
+    @GetMapping("/search/deletedMember")
+    public ResponseEntity<List<DeletedFilterResponse>> searchDeletedMembers(
+            @RequestParam(required = false) String field,
+            @RequestParam(required = false) Object value,
+            @RequestParam(required = false) String profileField,
+            @RequestParam(required = false) Object profileValue,
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate,
+            @RequestParam(required = false) String dateField
+    ) {
 
-
+        List<DeletedFilterResponse> responses = adminService.searchDeletedMembers(field, value, profileField, profileValue, startDate, endDate, dateField);
+        return ResponseEntity.ok(responses);
+    }
 
 
 

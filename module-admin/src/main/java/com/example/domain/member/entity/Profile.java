@@ -22,7 +22,7 @@ public class Profile {
 
     @Id
     @Column(name = "profile_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @JsonIgnore

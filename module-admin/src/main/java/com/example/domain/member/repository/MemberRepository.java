@@ -8,9 +8,6 @@ import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long>, JpaSpecificationExecutor<Member> {
     Optional<Member> findByEmail(String email);
-
-    //    @Query("select * from ")
-//    boolean existByEmail(String email);
     boolean existsByEmail(String email);
     boolean existsByPhone(String phone);
     boolean existsByNickname(String nickname);

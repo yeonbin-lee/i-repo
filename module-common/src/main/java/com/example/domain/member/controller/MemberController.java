@@ -45,9 +45,11 @@ public class MemberController {
      * */
     @DeleteMapping("/delete")
     public ResponseEntity<?> deleteUser(@RequestHeader("Authorization") String accessToken, @RequestParam ResignationReason reason) {
+//        memberService.delete(accessToken, reason);
         memberService.delete(accessToken, reason);
         return ResponseEntity.status(HttpStatus.OK).body("User deleted successfully");
     }
+
 
     /**
      * 로그아웃

@@ -1,5 +1,6 @@
 package com.example.domain.deleted.entity;
 
+import com.example.domain.deleted.entity.enums.ResignationReason;
 import com.example.domain.member.entity.enums.Gender;
 import com.example.domain.member.entity.enums.Provider;
 import com.example.domain.member.entity.enums.Role;
@@ -24,15 +25,12 @@ public class DeletedMember {
     private Long id;
 
     @Column
-    private Long member_code; // member에서 사용하는 pk(id)값
-
-    //    @Column(unique = true)
     private String email;
 
-    //    @Column(unique = true)
+    @Column
     private String nickname;
 
-    //    @Column(unique = true)
+    @Column
     private String phone;
 
     @Enumerated(EnumType.STRING)
@@ -42,6 +40,7 @@ public class DeletedMember {
     private String password;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Column
     private LocalDate birthday;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -58,13 +57,20 @@ public class DeletedMember {
     @Enumerated(EnumType.STRING)
     private Provider provider;
 
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "deleted_default_profile_id")
+    private DeletedProfile deletedDefaultProfile;
+
     @OneToMany(mappedBy = "deletedMember", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DeletedProfile> deletedProfiles = new ArrayList<DeletedProfile>();
 
+    @Enumerated(EnumType.STRING) // Enum을 사용할 경우
+    private ResignationReason resignationReason;
+
     @Builder
-    public DeletedMember(Long member_code, String email, String nickname, String phone, Gender gender, String password, LocalDate birthday,
+    public DeletedMember(Long member_id, String email, String nickname, String phone, Gender gender, String password, LocalDate birthday,
                          LocalDate createdAt, LocalDate cancelledAt, Role role, Provider provider) {
-        this.member_code = member_code;
+        this.id = member_id;
         this.email= email;
         this.nickname = nickname;
         this.phone = phone;
@@ -75,5 +81,10 @@ public class DeletedMember {
         this.cancelledAt = cancelledAt;
         this.role = role;
         this.provider = provider;
+    }
+
+    // 기본 프로필 설정 메서드
+    public void setDeletedDefaultProfile(DeletedProfile defaultProfile) {
+        this.deletedDefaultProfile = deletedDefaultProfile;
     }
 }

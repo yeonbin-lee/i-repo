@@ -31,7 +31,7 @@ public class ProfileServiceImpl implements ProfileService{
     @Override
     public void registerMainProfile(Member member) {
         Profile defaultProfile = Profile.builder()
-                .member(member)
+//                .member(member) -> 이걸 쓰면 기본 프로필이 추가 프로필 리스트에 자동으로 추가된다.
                 .owner(true)
                 .nickname(member.getNickname())
                 .gender(member.getGender())
@@ -42,7 +42,6 @@ public class ProfileServiceImpl implements ProfileService{
                 .diabetes(Choice.UNKNOWN)
                 .build();
         saveProfile(defaultProfile);
-
         member.setDefaultProfile(defaultProfile);
     }
 
@@ -78,7 +77,11 @@ public class ProfileServiceImpl implements ProfileService{
                 .hypertension(request.getHypertension())
                 .diabetes(request.getDiabetes())
                 .build();
+
         saveProfile(profile);
+        member.getProfiles().add(profile);
+
+
     }
 
     /**
@@ -102,8 +105,11 @@ public class ProfileServiceImpl implements ProfileService{
      */
     @Override
     public List<ProfileDTO> listProfile(ProfileListRequest request) {
-        List<Profile> profiles = memberService.findByEmail(request.getEmail()).getProfiles();
-        System.out.println(profiles);
+        Member member = memberService.findByEmail(request.getEmail());
+        List<Profile> profiles = member.getProfiles(); // 추가 프로필
+        Profile defaultProfile = member.getDefaultProfile(); // 기본 프로필
+        profiles.add(defaultProfile);
+
         List<ProfileDTO> profileVOList = new ArrayList<>();
 
         for (Profile profile : profiles) {

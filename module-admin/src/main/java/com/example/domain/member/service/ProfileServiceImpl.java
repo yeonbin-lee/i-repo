@@ -1,5 +1,7 @@
 package com.example.domain.member.service;
 
+import com.example.domain.deleted.entity.DeletedProfile;
+import com.example.domain.member.entity.Member;
 import com.example.domain.member.entity.Profile;
 import com.example.domain.member.repository.ProfileRepository;
 import jakarta.transaction.Transactional;
@@ -14,17 +16,47 @@ public class ProfileServiceImpl implements ProfileService {
 
     private final ProfileRepository profileRepository;
 
-    @Override
     @Transactional
-    public void saveProfile(Profile profile){
-        profileRepository.save(profile);
+    private Profile saveProfile(Profile profile){
+        return profileRepository.save(profile);
     }
 
-//    @Override
-//    public Profile findMainProfile(Long memberId){
-//        Optional<Profile> profile = profileRepository.findByMemberIdAndOwner(memberId);
-//        if (profile == null) {
-//            return null;
-//        } return profile.get();
-//    }
+    /**
+     * 기본 프로필 변환
+     */
+    @Override
+    public void convertDeletedDefaultProfileToDefaultProfile(Member member, DeletedProfile deletedProfile) {
+        System.out.println("들어오냐?");
+        Profile profile = Profile.builder()
+                .id(deletedProfile.getId())
+                .owner(deletedProfile.getOwner())
+                .nickname(deletedProfile.getNickname())
+                .gender(deletedProfile.getGender())
+                .birthday(deletedProfile.getBirthday())
+                .pregnancy(deletedProfile.getPregnancy())
+                .smoking(deletedProfile.getSmoking())
+                .hypertension(deletedProfile.getHypertension())
+                .diabetes(deletedProfile.getDiabetes())
+                .build();
+        System.out.println("시바시바시밧");
+        member.setDefaultProfile(saveProfile(profile));
+    }
+
+    @Override
+    public void convertDeletedProfileToProfile(Member member, DeletedProfile deletedProfile) {
+        Profile profile = Profile.builder()
+                .id(deletedProfile.getId())
+                .member(member)
+                .nickname(deletedProfile.getNickname())
+                .gender(deletedProfile.getGender())
+                .birthday(deletedProfile.getBirthday())
+                .owner(deletedProfile.getOwner())
+                .pregnancy(deletedProfile.getPregnancy())
+                .smoking(deletedProfile.getSmoking())
+                .hypertension(deletedProfile.getHypertension())
+                .diabetes(deletedProfile.getDiabetes())
+                .build();
+        saveProfile(profile);
+    }
+
 }

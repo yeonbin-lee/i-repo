@@ -22,7 +22,7 @@ public class Member {
 
     @Id
     @Column(name = "member_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true)
@@ -89,6 +89,10 @@ public class Member {
     // 기본 프로필 설정 메서드
     public void setDefaultProfile(Profile defaultProfile) {
         this.defaultProfile = defaultProfile;
+    }
+
+    public void setProfiles(List<Profile> profiles) {
+        this.profiles = profiles;
     }
 
 }

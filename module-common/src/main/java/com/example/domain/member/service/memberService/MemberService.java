@@ -25,6 +25,9 @@ public interface MemberService {
     public Member findMemberById(Long memberId);
     public Long findMemberIdByAccessToken(String accessToken);
     public void deleteMember(Member member);
-    public void delete(String accessToken, ResignationReason reason);
+//    public void delete(String accessToken, ResignationReason reason);
+    public void delete(String accessToken,ResignationReason reason);
     public void logout(String accessToken, String email);
+
+//    public void check(Long id);
 }

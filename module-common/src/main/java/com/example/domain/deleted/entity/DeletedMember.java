@@ -1,7 +1,6 @@
 package com.example.domain.deleted.entity;
 
 import com.example.domain.deleted.entity.enums.ResignationReason;
-import com.example.domain.member.entity.Profile;
 import com.example.domain.member.entity.enums.Gender;
 import com.example.domain.member.entity.enums.Provider;
 import com.example.domain.member.entity.enums.Role;
@@ -9,7 +8,6 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
@@ -23,19 +21,15 @@ import java.util.List;
 public class DeletedMember {
     @Id
     @Column(name = "deleted_member_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column
-    private Long member_code; // member에서 사용하는 pk(id)값
-
-//    @Column(unique = true)
     private String email;
 
-//    @Column(unique = true)
+    @Column
     private String nickname;
 
-//    @Column(unique = true)
+    @Column
     private String phone;
 
     @Enumerated(EnumType.STRING)
@@ -61,16 +55,21 @@ public class DeletedMember {
     @Enumerated(EnumType.STRING)
     private Provider provider;
 
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "deleted_default_profile_id")
+    private DeletedProfile deletedDefaultProfile;
+
     @OneToMany(mappedBy = "deletedMember", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DeletedProfile> deletedProfiles = new ArrayList<DeletedProfile>();
+
 
     @Enumerated(EnumType.STRING) // Enum을 사용할 경우
     private ResignationReason resignationReason;
 
     @Builder
-    public DeletedMember(Long member_code, String email, String nickname, String phone, Gender gender, String password, LocalDate birthday,
-                         LocalDate createdAt, LocalDate cancelledAt, Role role, Provider provider/*, ResignationReason reason*/) {
-        this.member_code = member_code;
+    public DeletedMember(Long member_id, String email, String nickname, String phone, Gender gender, String password, LocalDate birthday,
+                         LocalDate createdAt, LocalDate cancelledAt, Role role, Provider provider, ResignationReason reason) {
+        this.id = member_id;
         this.email= email;
         this.nickname = nickname;
         this.phone = phone;
@@ -81,11 +80,19 @@ public class DeletedMember {
         this.cancelledAt = cancelledAt;
         this.role = role;
         this.provider = provider;
-//        this.resignationReason = reason;
+        this.resignationReason = reason;
     }
 
     public void setResignationReason(ResignationReason reason) {
         this.resignationReason = reason;
     }
 
+    // 기본 프로필 설정 메서드
+    public void setDefaultProfile(DeletedProfile deletedDefaultProfile) {
+        this.deletedDefaultProfile = deletedDefaultProfile;
+    }
+
+    public void setDeletedProfiles(List<DeletedProfile> deletedProfiles) {
+        this.deletedProfiles = deletedProfiles;
+    }
 }

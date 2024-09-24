@@ -1,26 +1,37 @@
 package com.example.domain.member.service.memberService;
 
 import com.example.domain.auth.service.RefreshTokenService;
+import com.example.domain.deleted.entity.DeletedMember;
+import com.example.domain.deleted.entity.DeletedProfile;
 import com.example.domain.deleted.entity.enums.ResignationReason;
+import com.example.domain.deleted.repository.DeletedMemberRepository;
+import com.example.domain.deleted.service.DeletedProfileService;
 import com.example.domain.member.controller.dto.request.member.NicknameChangeRequest;
 import com.example.domain.member.controller.dto.request.member.PwChangeRequest;
 import com.example.domain.member.controller.dto.response.MemberResponse;
 import com.example.domain.member.entity.Member;
+import com.example.domain.member.entity.Profile;
 import com.example.domain.member.repository.MemberRepository;
 import com.example.domain.deleted.service.DeletedMemberService;
 import com.example.domain.member.service.logoutService.LogoutService;
 import com.example.global.config.jwt.JwtTokenProvider;
 import com.example.global.exception.custom.NotEqualsPasswordException;
 import com.example.global.exception.custom.UserNotFoundException;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +43,10 @@ public class MemberServiceImpl implements MemberService{
     private final RefreshTokenService refreshTokenService;
     private final LogoutService logoutService;
     private final DeletedMemberService deletedMemberService;
+    private final DeletedProfileService deletedProfileService;
+
+    private final DeletedMemberRepository deletedMemberRepository;
+
 
     /** Member 조회 */
     @Override
@@ -63,11 +78,25 @@ public class MemberServiceImpl implements MemberService{
         }
     }
 
+
     /** Member 삭제 */
     @Override
+    @Transactional
     public void delete(String accessToken, ResignationReason reason) {
         Member member = findMemberById(findMemberIdByAccessToken(accessToken));
-        deletedMemberService.saveDeletedMember(member, reason);
+        Profile defaultProfile = member.getDefaultProfile();
+        List<Profile> profiles = member.getProfiles();
+
+        DeletedMember deletedMember = deletedMemberService.convertMemberToDeletedMember(member, reason);
+        deletedMemberService.saveDeletedMember(deletedMember);
+
+        deletedProfileService.convertDefaultProfileToDeletedDefaultProfile(deletedMember, defaultProfile);
+
+        for (Profile profile : profiles) {
+            deletedProfileService.convertProfileToDeletedProfile(deletedMember, profile);
+        }
+        deletedMemberService.saveDeletedMember(deletedMember);
+
         deleteMember(member); // member 엔티티에서 삭제
         logout(accessToken, member.getEmail()); // accessToken, RefreshToken 무효화
     }
@@ -104,6 +133,7 @@ public class MemberServiceImpl implements MemberService{
         }
     }
 
+    @Transactional
     public Member findMemberById(Long memberId){
         return memberRepository.findById(memberId).orElseThrow(
                 () -> new UserNotFoundException("회원 정보가 존재하지 않습니다.")

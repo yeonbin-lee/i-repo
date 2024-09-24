@@ -75,6 +75,11 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public void signup(SignupRequest request) {
 
+        // 인증되지않은 전화번호
+        if(!isTokenPhone(request.getPhone())){
+            throw new DataIntegrityViolationException("잘못된 요청입니다.");
+        }
+
         // CHECK EMAIL, PHONE, NICKNAME DUPLICATE
         if(memberService.existByEmail(request.getEmail())){
             throw new DataIntegrityViolationException("중복되는 이메일입니다.");
@@ -86,11 +91,6 @@ public class AuthServiceImpl implements AuthService {
 
         if(memberService.existByNickname(request.getNickname())){
             throw new DataIntegrityViolationException("중복되는 닉네임입니다.");
-        }
-
-        // 인증되지않은 전화번호
-        if(!isTokenPhone(request.getPhone())){
-            throw new DataIntegrityViolationException("잘못된 요청입니다.");
         }
 
         // 회원가입 후 Redis에 저장된 전화번호 인증 정보를 삭제
