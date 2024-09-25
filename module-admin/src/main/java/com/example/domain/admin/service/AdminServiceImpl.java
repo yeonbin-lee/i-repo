@@ -31,14 +31,6 @@ import java.util.stream.Collectors;
 public class AdminServiceImpl implements AdminService{
     private final DeletedMemberService deletedMemberService;
     private final MemberService memberService;
-    private final ProfileService profileService;
-    private final MemberRepository memberRepository;
-
-    @Override
-    @Transactional
-    public void restoreMember(RestoreRequest request){
-        deletedMemberService.restoreMember(request);
-    }
 
 
     public List<FilterResponse> searchMembers(String field, Object value, String profileField, Object profileValue, LocalDate startDate, LocalDate endDate, String dateField) {
@@ -62,16 +54,14 @@ public class AdminServiceImpl implements AdminService{
     }
 
 
-    @Transactional
+
     public List<DeletedFilterResponse> searchDeletedMembers(String field, Object value, String profileField, Object profileValue, LocalDate startDate, LocalDate endDate, String dateField) {
         Specification<DeletedMember> spec = Specification.where(null);
-        System.out.println("111");
         if (value != null) {
             spec = spec.and(DeletedMemberSpecification.filterByField(field, value));
         }
 
         if (profileValue != null) {
-            System.out.println("222");
             spec = spec.and(DeletedMemberSpecification.filterByProfileField(profileField, profileValue));
         }
 
@@ -84,4 +74,6 @@ public class AdminServiceImpl implements AdminService{
                 .map(DeletedMemberMapper::toFilterResponse)
                 .collect(Collectors.toList());
     }
+
+
 }

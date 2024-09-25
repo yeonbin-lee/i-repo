@@ -55,12 +55,6 @@ public class DeletedMemberServiceImpl implements DeletedMemberService{
         deleteDeletedMember(deletedMember);
     }
 
-//    @Transactional
-//    public DeletedMember findMemberWithProfilesById(Long id) {
-//        return deletedMemberRepository.findMemberWithProfilesById(id).orElseThrow(
-//                () -> new NotFoundException("₩ 문제")
-//        );
-//    }
 
     @Transactional
     public DeletedMember findDeletedMemberByIdFetch(Long id) {

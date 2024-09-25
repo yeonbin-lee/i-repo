@@ -32,6 +32,10 @@ public class MemberServiceImpl implements MemberService{
                 .build();
     }
 
+    public List<Member> findAllMember(){
+        return memberRepository.findAll();
+    }
+
 
     public List<Member> findAll(Specification<Member> spec) {
         return memberRepository.findAll(spec);

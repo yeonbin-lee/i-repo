@@ -11,12 +11,16 @@ import com.example.domain.coolsms.service.SmsService;
 import com.example.domain.member.controller.vo.KakaoInfo;
 import com.example.domain.member.controller.vo.KakaoToken;
 import com.example.domain.member.entity.Member;
+import com.example.domain.member.entity.MemberTermsAgreement;
+import com.example.domain.member.entity.TermsCondition;
 import com.example.domain.member.entity.enums.Gender;
 import com.example.domain.member.entity.enums.Provider;
 import com.example.domain.member.entity.enums.Role;
 import com.example.domain.member.service.logoutService.LogoutService;
 import com.example.domain.member.service.memberService.MemberService;
 import com.example.domain.member.service.profileService.ProfileService;
+import com.example.domain.member.service.terms.MemberTermsAgreementService;
+import com.example.domain.member.service.terms.TermsConditionService;
 import com.example.global.config.jwt.CustomUserDetails;
 import com.example.global.config.jwt.JwtTokenProvider;
 import com.example.global.config.jwt.RefreshToken;
@@ -38,6 +42,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -64,6 +69,9 @@ public class AuthServiceImpl implements AuthService {
     private final LogoutService logoutService;
     private final RedisTemplate<String, Object> redisTemplate;
     private final UUIDUtil uuidUtil;
+
+    private final TermsConditionService termsConditionService;
+    private final MemberTermsAgreementService memberTermsAgreementService;
 //    private final DeletedMemberService deletedMemberService;
 
 
@@ -93,6 +101,17 @@ public class AuthServiceImpl implements AuthService {
             throw new DataIntegrityViolationException("중복되는 닉네임입니다.");
         }
 
+        // 필수 약관 ID 목록
+        List<Long> requiredTermsIds = List.of(1L, 2L, 3L);
+
+        // 사용자가 동의한 약관 ID 리스트
+        List<Long> agreedTermsIds = request.getAgreedTermsIds();
+
+        // 필수 약관에 동의했는지 확인
+        if (!agreedTermsIds.containsAll(requiredTermsIds)) {
+            throw new IllegalArgumentException("모든 필수 약관에 동의해야 합니다.");
+        }
+
         // 회원가입 후 Redis에 저장된 전화번호 인증 정보를 삭제
         deletePhoneNumberVerification(request.getPhone());
 
@@ -113,6 +132,19 @@ public class AuthServiceImpl implements AuthService {
 
         // SAVE MEMBER ENTITY
         memberService.saveMember(member);
+
+        // 동의한 약관 정보 저장
+        for (Long termsId : agreedTermsIds) {
+            TermsCondition termsCondition = termsConditionService.findTermsConditionById(termsId);
+
+            memberTermsAgreementService.saveMemberTermsAgreement(
+                    MemberTermsAgreement.builder()
+                            .member(member)
+                            .termsCondition(termsCondition)
+                            .isAgreed(true)
+                            .agreedAt(LocalDate.now())
+                            .build());
+        }
     }
 
 //    /** 이메일 중복체크 */

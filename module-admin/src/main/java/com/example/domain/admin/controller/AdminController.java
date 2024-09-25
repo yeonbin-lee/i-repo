@@ -1,6 +1,9 @@
 package com.example.domain.admin.controller;
 
+import com.example.domain.admin.controller.dto.request.CreateTermsConditionRequest;
+import com.example.domain.admin.controller.dto.request.DeleteTermsCondition;
 import com.example.domain.admin.controller.dto.request.RestoreRequest;
+import com.example.domain.admin.controller.dto.request.UpdateTermsConditionRequest;
 import com.example.domain.admin.controller.dto.response.DeletedFilterResponse;
 import com.example.domain.admin.controller.dto.response.FilterResponse;
 import com.example.domain.admin.service.AdminService;
@@ -8,6 +11,7 @@ import com.example.domain.deleted.entity.DeletedMember;
 import com.example.domain.deleted.repository.DeletedMemberRepository;
 import com.example.domain.deleted.service.DeletedMemberService;
 import com.example.domain.member.entity.Member;
+import com.example.domain.member.service.TermsConditionService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,7 +29,7 @@ public class AdminController {
 
     private final AdminService adminService;
     private final DeletedMemberService deletedMemberService;
-    private final DeletedMemberRepository deletedMemberRepository;
+
 
     // 테스팅 용도
     @PostMapping("/aa")
@@ -41,7 +45,7 @@ public class AdminController {
     /**
      * 계정, 프로필 복구 API
      */
-    @DeleteMapping("/member/restore")
+    @DeleteMapping("/restore/member")
     private ResponseEntity<?> restoreMember(@RequestBody RestoreRequest request){
         deletedMemberService.restoreMember(request);
 //        adminService.restoreMember(request);
@@ -63,7 +67,7 @@ public class AdminController {
     ) {
 
         List<FilterResponse> responses = adminService.searchMembers(field, value, profileField, profileValue, startDate, endDate, dateField);
-        return ResponseEntity.ok(responses);
+        return ResponseEntity.status(HttpStatus.OK).body(responses);
     }
 
     /**
@@ -81,9 +85,8 @@ public class AdminController {
     ) {
 
         List<DeletedFilterResponse> responses = adminService.searchDeletedMembers(field, value, profileField, profileValue, startDate, endDate, dateField);
-        return ResponseEntity.ok(responses);
+        return ResponseEntity.status(HttpStatus.OK).body(responses);
     }
-
 
 
 }

@@ -12,4 +12,5 @@ public interface MemberService {
     public void saveMember(Member member);
 
     public List<Member> findAll(Specification<Member> spec);
+    public List<Member> findAllMember();
 }

@@ -40,4 +40,6 @@ public class SignupRequest {
     @MinimumAge
     private LocalDate birthday;
 
+    private List<Long> agreedTermsIds;
+
 }
