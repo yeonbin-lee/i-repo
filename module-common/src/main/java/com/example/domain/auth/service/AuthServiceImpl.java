@@ -75,6 +75,22 @@ public class AuthServiceImpl implements AuthService {
     private final MemberTermsAgreementService memberTermsAgreementService;
     private final ConsentService consentService;
 
+    /** 이메일 중복체크 */
+    public Boolean checkDuplicateEmail(String email){
+        return memberService.existByEmail(email);
+    }
+
+    /** 전화번호 중복체크 */
+    public Boolean checkDuplicatePhone(String phone) {
+        return memberService.existByPhone(phone);
+    }
+
+    /** 닉네임 중복체크 */
+    public Boolean checkDuplicateNickname(String nickname) {
+        return memberService.existByNickname(nickname);
+    }
+
+
 
     /** [일반] 이메일 회원가입 API
      * 이메일, 전화번호, 닉네임 중복 체크
@@ -154,10 +170,7 @@ public class AuthServiceImpl implements AuthService {
         consentService.saveSystemConsent(member, request.getSystemConsent());
     }
 
-//    /** 이메일 중복체크 */
-//    public boolean checkDuplicateEmail(String email){
-//        return memberService.existByEmail(email);
-//    }
+
 
     /**
      * 전화번호로 이메일 찾기

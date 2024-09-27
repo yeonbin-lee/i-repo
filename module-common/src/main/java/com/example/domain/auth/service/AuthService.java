@@ -8,7 +8,12 @@ public interface AuthService {
 
     public void signup(SignupRequest requestDto);
 
-//    public boolean checkDuplicateEmail(String email);
+    public Boolean checkDuplicateEmail(String email);
+
+    public Boolean checkDuplicatePhone(String phone);
+
+    public Boolean checkDuplicateNickname(String nickname);
+
 
     public FindEmailResponse findEmailByPhone(FindEmailByPhoneRequest request);
 

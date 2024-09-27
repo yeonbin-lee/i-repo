@@ -34,16 +34,40 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body("User registered successfully!");
     }
 
-//    /**
-//     * [일반] 이메일 중복체크 API
-//     * @param request - email
-//     * @return response - boolean (true - 이메일이 이미 존재할 경우, false - 사용할 수 있는 이메일)
-//     * */
-//    @PostMapping("/email/duplicate")
-//    public ResponseEntity<?> emailDuplicate(@RequestBody @Valid CheckEmailDuplicateRequest request){
-//        Boolean checkEmailDuplicate = authService.checkDuplicateEmail(request.getEmail());
-//        return ResponseEntity.status(HttpStatus.OK).body(checkEmailDuplicate);
-//    }
+    /**
+     * [일반] 이메일 중복체크 API
+     * @param email
+     * @return response - boolean (true - 이메일이 이미 존재할 경우, false - 사용할 수 있는 이메일)
+     * */
+    @PostMapping("/email/duplicate")
+    public ResponseEntity<?> checkEmailDuplicate(@RequestParam String email){
+        Boolean checkEmailDuplicate = authService.checkDuplicateEmail(email);
+        return ResponseEntity.status(HttpStatus.OK).body(checkEmailDuplicate);
+    }
+
+    /**
+     * [일반] 전화번호 중복체크 API
+     * @param phone
+     * @return response - boolean
+     * */
+    @PostMapping("/phone/duplicate")
+    public ResponseEntity<?> checkPhoneDuplicate(@RequestParam String phone){
+        Boolean checkPhoneDuplicate = authService.checkDuplicatePhone(phone);
+        return ResponseEntity.status(HttpStatus.OK).body(checkPhoneDuplicate);
+    }
+
+    /**
+     * [일반] 닉네임 중복체크 API
+     * @param nickname
+     * @return response - boolean
+     * */
+    @PostMapping("/nickname/duplicate")
+    public ResponseEntity<?> checkNicknameDuplicate(@RequestParam String nickname){
+        Boolean checkNicknameDuplicate = authService.checkDuplicateEmail(nickname);
+        return ResponseEntity.status(HttpStatus.OK).body(checkNicknameDuplicate);
+    }
+
+
 
     /**
      * [일반] 비밀번호 재설정 API by phone - 비밀번호를 잊어버렸을 경우
