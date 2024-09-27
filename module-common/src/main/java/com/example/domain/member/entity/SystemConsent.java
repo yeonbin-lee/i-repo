@@ -11,10 +11,10 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Getter
 @Entity
-public class MarketingConsent {
+public class SystemConsent {
 
     @Id
-    @Column(name = "marketing_consent_id")
+    @Column(name = "system_consent_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -25,11 +25,10 @@ public class MarketingConsent {
     @Column(name = "is_agreed", nullable = false)
     private Boolean isAgreed; // 동의 여부를 나타내는 필드
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Column(name = "date")
+    @Column(name = "ate")
     private LocalDate date;
-
     @Builder
-    public MarketingConsent(Member member, Boolean isAgreed, LocalDate date) {
+    public SystemConsent(Member member, Boolean isAgreed, LocalDate date) {
         this.member = member;
         this.isAgreed = isAgreed;
         this.date = date;

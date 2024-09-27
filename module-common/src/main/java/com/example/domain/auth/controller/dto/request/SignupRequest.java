@@ -1,10 +1,6 @@
 package com.example.domain.auth.controller.dto.request;
 
-import com.example.domain.auth.controller.vo.TermAcceptance;
-import com.example.domain.member.entity.Member;
 import com.example.domain.member.entity.enums.Gender;
-import com.example.domain.member.entity.enums.Provider;
-import com.example.domain.member.entity.enums.Role;
 import com.example.domain.member.utils.MinimumAge;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -41,5 +37,8 @@ public class SignupRequest {
     private LocalDate birthday;
 
     private List<Long> agreedTermsIds;
+
+    private Boolean marketingConsent; // 마케팅 수신 동의
+    private Boolean systemConsent;    // 시스템 알림 동의
 
 }

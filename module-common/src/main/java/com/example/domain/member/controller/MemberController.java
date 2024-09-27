@@ -2,9 +2,12 @@ package com.example.domain.member.controller;
 
 import com.example.domain.auth.controller.dto.request.LogoutRequest;
 import com.example.domain.deleted.entity.enums.ResignationReason;
+import com.example.domain.member.controller.dto.request.member.ConsentRequest;
 import com.example.domain.member.controller.dto.request.member.NicknameChangeRequest;
 import com.example.domain.member.controller.dto.request.member.PwChangeRequest;
 import com.example.domain.member.controller.dto.response.MemberResponse;
+import com.example.domain.member.entity.Member;
+import com.example.domain.member.service.consentService.ConsentService;
 import com.example.domain.member.service.memberService.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
 
     private final MemberService memberService;
+    private final ConsentService consentService;
 
     /**
      * [일반] 비밀번호 재설정 API - 로그인을 한 상태에서 비밀번호를 변경하고싶을 경우
@@ -75,4 +79,36 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    /**
+     * 마케팅 수신 동의 변경 API
+     */
+    @PostMapping("/consent/marketing")
+    public ResponseEntity<?> changeMarketingConsent(@RequestHeader("Authorization") String accessToken, ConsentRequest request) {
+        Member member = memberService.findMemberById(memberService.findMemberIdByAccessToken(accessToken));
+        consentService.saveMarketingConsent(member, request.getIsAgreed());
+        return ResponseEntity.status(HttpStatus.OK).body("Marketing Consent Changed Successfully!");
+    }
+
+
+    /**
+     * 시스템 수신 동의 변경 API
+     */
+    @PostMapping("/consent/system")
+    public ResponseEntity<?> changeSystemConsent(@RequestHeader("Authorization") String accessToken, ConsentRequest request) {
+        Member member = memberService.findMemberById(memberService.findMemberIdByAccessToken(accessToken));
+        consentService.saveSystemConsent(member, request.getIsAgreed());
+        return ResponseEntity.status(HttpStatus.OK).body("System Consent Changed Successfully!");
+    }
+
+    /**
+     * 선택 사항 전부 (마케팅,시스템) 수신 동의 변경 API
+     */
+    @PostMapping("/consent")
+    public ResponseEntity changeAllConsent(@RequestHeader("Authorization") String accessToken, ConsentRequest request) {
+        Member member = memberService.findMemberById(memberService.findMemberIdByAccessToken(accessToken));
+        consentService.saveMarketingConsent(member, request.getIsAgreed());
+        consentService.saveSystemConsent(member, request.getIsAgreed());
+        consentService.saveSystemConsent(member, request.getIsAgreed());
+        return ResponseEntity.status(HttpStatus.OK).body("All Consent Changed Successfully!");
+    }
 }

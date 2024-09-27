@@ -16,6 +16,7 @@ import com.example.domain.member.entity.TermsCondition;
 import com.example.domain.member.entity.enums.Gender;
 import com.example.domain.member.entity.enums.Provider;
 import com.example.domain.member.entity.enums.Role;
+import com.example.domain.member.service.consentService.ConsentService;
 import com.example.domain.member.service.logoutService.LogoutService;
 import com.example.domain.member.service.memberService.MemberService;
 import com.example.domain.member.service.profileService.ProfileService;
@@ -72,7 +73,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final TermsConditionService termsConditionService;
     private final MemberTermsAgreementService memberTermsAgreementService;
-//    private final DeletedMemberService deletedMemberService;
+    private final ConsentService consentService;
 
 
     /** [일반] 이메일 회원가입 API
@@ -133,7 +134,7 @@ public class AuthServiceImpl implements AuthService {
         // SAVE MEMBER ENTITY
         memberService.saveMember(member);
 
-        // 동의한 약관 정보 저장
+        // 동의한 필수 약관 정보 저장
         for (Long termsId : agreedTermsIds) {
             TermsCondition termsCondition = termsConditionService.findTermsConditionById(termsId);
 
@@ -145,6 +146,12 @@ public class AuthServiceImpl implements AuthService {
                             .agreedAt(LocalDate.now())
                             .build());
         }
+
+        // 선택 약관 정보 저장 - 마케팅
+        consentService.saveMarketingConsent(member, request.getMarketingConsent());
+
+        // 선택 약관 정보 저장 - 시스템
+        consentService.saveSystemConsent(member, request.getSystemConsent());
     }
 
 //    /** 이메일 중복체크 */
