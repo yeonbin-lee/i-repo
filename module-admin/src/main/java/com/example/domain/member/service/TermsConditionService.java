@@ -10,9 +10,11 @@ import java.util.List;
 
 public interface TermsConditionService {
 
-    public void createTermsCondition(CreateTermsConditionRequest request);
+    public void createMandatoryTermsCondition(CreateTermsConditionRequest request);
+    public void createOptionalTermsCondition(CreateTermsConditionRequest request);
     public void updateTermsCondition(UpdateTermsConditionRequest request);
     public void deleteTermsCondition(DeleteTermsCondition request);
+
     public TermsCondition findTermsConditionById(Long id);
 
     public List<TermsConditionDTO> findAllTermsCondition();

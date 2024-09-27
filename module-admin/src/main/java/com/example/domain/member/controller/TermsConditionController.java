@@ -22,13 +22,25 @@ public class TermsConditionController {
     private final TermsConditionService termsConditionService;
 
     /**
-     * 필수 약관 생성
+     * 필수 약관 생성 (모든 멤버에 대한 업데이트 발생)
      */
-    @PostMapping("/create/term")
-    public ResponseEntity<?> createTerm(@RequestBody CreateTermsConditionRequest request) {
-        termsConditionService.createTermsCondition(request);
-        return ResponseEntity.status(HttpStatus.OK).body("Created Terms Successfully!");
+    @PostMapping("/create/mandatory/term")
+    public ResponseEntity<?> createMandatoryTerm(@RequestBody CreateTermsConditionRequest request) {
+        termsConditionService.createMandatoryTermsCondition(request);
+        return ResponseEntity.status(HttpStatus.OK).body("Mandatory Terms Created Successfully!");
     }
+
+    /**
+     * 선택 약관 생성
+     */
+    @PostMapping("/create/optional/term")
+    public ResponseEntity<?> createOptionalTerm(@RequestBody CreateTermsConditionRequest request) {
+        termsConditionService.createOptionalTermsCondition(request);
+        return ResponseEntity.status(HttpStatus.OK).body("Optional Terms Created Successfully!");
+
+
+    }
+
 
     /**
      * 필수 약관 업데이트

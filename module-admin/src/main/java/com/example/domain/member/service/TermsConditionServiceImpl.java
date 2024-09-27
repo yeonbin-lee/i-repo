@@ -23,7 +23,7 @@ public class TermsConditionServiceImpl implements TermsConditionService{
 
     @Override
     @Transactional
-    public void createTermsCondition(CreateTermsConditionRequest request) {
+    public void createMandatoryTermsCondition(CreateTermsConditionRequest request) {
 
         TermsCondition termsCondition = TermsCondition.builder()
                 .title(request.getTitle())
@@ -36,6 +36,16 @@ public class TermsConditionServiceImpl implements TermsConditionService{
         // 필수 동의 체크를 위한 MemberTermsCondition -> 자동 생성/ User의 동의를 구하지 않음
         // 모든 멤버에 대해 동의 사항 생성
         memberTermsAgreementService.updateAllMembersToAgreeToTerms(termsCondition);
+    }
+
+    public void createOptionalTermsCondition(CreateTermsConditionRequest request) {
+        TermsCondition termsCondition = TermsCondition.builder()
+                .title(request.getTitle())
+                .content(request.getContent())
+                .createdAt(LocalDate.now())
+                .build();
+
+        termsConditionRepository.save(termsCondition);
     }
 
     @Override
