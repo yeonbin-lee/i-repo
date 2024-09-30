@@ -1,4 +1,4 @@
-package com.example.domain.member.service;
+package com.example.domain.member.service.terms;
 
 import com.example.domain.admin.controller.dto.request.CreateTermsConditionRequest;
 import com.example.domain.admin.controller.dto.request.DeleteTermsCondition;

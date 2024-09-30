@@ -1,28 +1,20 @@
 package com.example.domain.admin.service;
 
-import com.example.domain.admin.controller.dto.request.RestoreRequest;
 import com.example.domain.admin.controller.dto.response.DeletedFilterResponse;
 import com.example.domain.admin.controller.dto.response.FilterResponse;
 import com.example.domain.deleted.entity.DeletedMember;
-import com.example.domain.deleted.entity.DeletedProfile;
 import com.example.domain.deleted.repository.DeletedMemberSpecification;
 import com.example.domain.deleted.service.DeletedMemberService;
 import com.example.domain.member.entity.Member;
-import com.example.domain.member.entity.Profile;
 import com.example.domain.member.mapper.DeletedMemberMapper;
 import com.example.domain.member.mapper.MemberMapper;
-import com.example.domain.member.repository.MemberRepository;
 import com.example.domain.member.repository.MemberSpecification;
-import com.example.domain.member.service.MemberService;
-import com.example.domain.member.service.ProfileService;
-import jakarta.transaction.Transactional;
+import com.example.domain.member.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 

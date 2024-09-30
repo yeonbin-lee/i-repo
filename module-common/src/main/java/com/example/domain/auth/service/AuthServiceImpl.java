@@ -17,6 +17,7 @@ import com.example.domain.member.entity.enums.Gender;
 import com.example.domain.member.entity.enums.Provider;
 import com.example.domain.member.entity.enums.Role;
 import com.example.domain.member.service.consentService.ConsentService;
+import com.example.domain.member.service.fcm.FcmService;
 import com.example.domain.member.service.logoutService.LogoutService;
 import com.example.domain.member.service.memberService.MemberService;
 import com.example.domain.member.service.profileService.ProfileService;
@@ -67,9 +68,8 @@ public class AuthServiceImpl implements AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
     private final KakaoClient kakaoClient;
-    private final LogoutService logoutService;
     private final RedisTemplate<String, Object> redisTemplate;
-    private final UUIDUtil uuidUtil;
+    private final FcmService fcmService;
 
     private final TermsConditionService termsConditionService;
     private final MemberTermsAgreementService memberTermsAgreementService;
@@ -238,6 +238,10 @@ public class AuthServiceImpl implements AuthService {
         if (!passwordEncoder.matches(request.getPassword(), member.getPassword())) {
             throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
         }
+
+        System.out.println("개빡치네" + request.getFcmToken());
+        // FCM Token 갱신
+        fcmService.updateFCMToken(member, request.getFcmToken());
 
         // GENERATE ACCESS_TOKEN AND REFRESH_TOKEN
         String accessToken = jwtTokenProvider.generateAccessToken(
@@ -450,7 +454,6 @@ public class AuthServiceImpl implements AuthService {
         Member member = new Member(newNickname, email, password, phone, Gender.valueOf(gender.toUpperCase()), birth, LocalDate.now(), Role.ROLE_USER, Provider.KAKAO);
         return member;
     }
-
 
 
     private TokenResponse createAndSaveToken(Member member) {

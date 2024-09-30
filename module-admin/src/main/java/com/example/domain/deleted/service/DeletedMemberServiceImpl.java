@@ -5,11 +5,10 @@ import com.example.domain.deleted.entity.DeletedMember;
 import com.example.domain.deleted.entity.DeletedProfile;
 import com.example.domain.deleted.entity.Restore;
 import com.example.domain.deleted.repository.DeletedMemberRepository;
-import com.example.domain.deleted.repository.DeletedProfileRepository;
 import com.example.domain.deleted.repository.RestoreRepository;
 import com.example.domain.member.entity.Member;
-import com.example.domain.member.service.MemberService;
-import com.example.domain.member.service.ProfileService;
+import com.example.domain.member.service.member.MemberService;
+import com.example.domain.member.service.profile.ProfileService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;

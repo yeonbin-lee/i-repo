@@ -1,4 +1,4 @@
-package com.example.domain.member.service;
+package com.example.domain.member.service.member;
 
 import com.example.domain.deleted.entity.DeletedMember;
 import com.example.domain.member.entity.Member;

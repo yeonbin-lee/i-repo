@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Getter
 @Entity
+@Table(name = "system_consent")
 public class SystemConsent {
 
     @Id
@@ -25,7 +26,7 @@ public class SystemConsent {
     @Column(name = "is_agreed", nullable = false)
     private Boolean isAgreed; // 동의 여부를 나타내는 필드
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Column(name = "ate")
+    @Column(name = "date")
     private LocalDate date;
     @Builder
     public SystemConsent(Member member, Boolean isAgreed, LocalDate date) {

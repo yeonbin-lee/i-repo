@@ -1,18 +1,10 @@
 package com.example.domain.admin.controller;
 
-import com.example.domain.admin.controller.dto.request.CreateTermsConditionRequest;
-import com.example.domain.admin.controller.dto.request.DeleteTermsCondition;
 import com.example.domain.admin.controller.dto.request.RestoreRequest;
-import com.example.domain.admin.controller.dto.request.UpdateTermsConditionRequest;
 import com.example.domain.admin.controller.dto.response.DeletedFilterResponse;
 import com.example.domain.admin.controller.dto.response.FilterResponse;
 import com.example.domain.admin.service.AdminService;
-import com.example.domain.deleted.entity.DeletedMember;
-import com.example.domain.deleted.repository.DeletedMemberRepository;
 import com.example.domain.deleted.service.DeletedMemberService;
-import com.example.domain.member.entity.Member;
-import com.example.domain.member.service.TermsConditionService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

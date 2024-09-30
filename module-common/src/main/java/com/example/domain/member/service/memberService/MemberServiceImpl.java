@@ -45,8 +45,6 @@ public class MemberServiceImpl implements MemberService{
     private final DeletedMemberService deletedMemberService;
     private final DeletedProfileService deletedProfileService;
 
-    private final DeletedMemberRepository deletedMemberRepository;
-
 
     /** Member 조회 */
     @Override

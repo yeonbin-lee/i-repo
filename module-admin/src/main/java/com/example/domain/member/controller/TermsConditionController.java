@@ -5,7 +5,7 @@ import com.example.domain.admin.controller.dto.request.DeleteTermsCondition;
 import com.example.domain.admin.controller.dto.request.UpdateTermsConditionRequest;
 import com.example.domain.admin.controller.dto.response.TermsConditionDTO;
 import com.example.domain.member.entity.TermsCondition;
-import com.example.domain.member.service.TermsConditionService;
+import com.example.domain.member.service.terms.TermsConditionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -111,4 +111,5 @@ public class MemberController {
         consentService.saveSystemConsent(member, request.getIsAgreed());
         return ResponseEntity.status(HttpStatus.OK).body("All Consent Changed Successfully!");
     }
+
 }
