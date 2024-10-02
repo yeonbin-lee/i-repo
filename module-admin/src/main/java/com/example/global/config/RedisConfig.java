@@ -30,6 +30,16 @@ public class RedisConfig {
         return new LettuceConnectionFactory(redisProperties.getHost(), redisProperties.getPort());
     }
 
+//    @Bean
+//    public RedisTemplate<String, Object> redisTemplate() {
+//        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>(); // RedisTemplate 인스턴스 생성
+//        redisTemplate.setConnectionFactory(redisConnectionFactory()); // Redis 연결 팩토리 설정
+//        redisTemplate.setKeySerializer(new StringRedisSerializer()); // 키를 문자열로 직렬화하도록 설정
+//        redisTemplate.setValueSerializer(new StringRedisSerializer()); // 값을 문자열로 직렬화하도록 설정
+//
+//        return redisTemplate; // 설정이 완료된 RedisTemplate 인스턴스를 반환
+//    }
+
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
@@ -42,6 +52,7 @@ public class RedisConfig {
         return template;
     }
 
+
     @Bean
     public RedisCacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
@@ -53,4 +64,6 @@ public class RedisConfig {
                 .cacheDefaults(config)
                 .build();
     }
+
+
 }

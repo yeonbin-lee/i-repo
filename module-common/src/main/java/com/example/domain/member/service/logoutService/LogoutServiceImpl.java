@@ -13,7 +13,7 @@ public class LogoutServiceImpl implements LogoutService {
     private final RedisTemplate<String, Object> redisTemplate;
 
     public void logoutUser(String accessToken, Integer sec) {
-        // Redis에 "logout:email" 형식으로 저장
+        // Redis에 "logout:accessToken" 형식으로 저장
         String redisKey = "logout:" + accessToken;
 
         // 로그아웃 상태를 기록 (true로 설정)

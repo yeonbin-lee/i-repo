@@ -37,14 +37,13 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'de.codecentric:spring-boot-admin-starter-client:3.2.2'
     implementation 'org.projectlombok:lombok:1.18.34'
 
     // Spring Boot의 캐시 지원
     implementation 'org.springframework.boot:spring-boot-starter-cache'
-    // Caffeine Cache 의존성
-    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
 
     //Jwt
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'

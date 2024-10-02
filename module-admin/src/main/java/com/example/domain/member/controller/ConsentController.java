@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequiredArgsConstructor
@@ -16,8 +17,9 @@ public class ConsentController {
     private final ConsentService consentService;
 
     @GetMapping("/search/all")
-    public ResponseEntity<?> searchMarketingMember(){
-        return ResponseEntity.status(HttpStatus.OK).body(consentService.getMarketingConsentFCMTokenList());
+    public ResponseEntity<?> sendNotificationToAll(){
+        return ResponseEntity.status(HttpStatus.OK).body(consentService.findAllAgreedMember());
     }
+
 
 }

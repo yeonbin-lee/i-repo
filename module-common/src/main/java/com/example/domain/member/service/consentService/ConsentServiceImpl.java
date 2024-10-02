@@ -6,10 +6,11 @@ import com.example.domain.member.entity.SystemConsent;
 import com.example.domain.member.repository.MarketingConsentRepository;
 import com.example.domain.member.repository.SystemConsentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -18,16 +19,20 @@ public class ConsentServiceImpl implements ConsentService{
     private final MarketingConsentRepository marketingConsentRepository;
     private final SystemConsentRepository systemConsentRepository;
 
+
     @Override
-    public void saveMarketingConsent(Member member, Boolean isAgreed) {
-            marketingConsentRepository.save(
-                    MarketingConsent.builder()
-                            .member(member)
-                            .isAgreed(isAgreed)
-                            .date(LocalDate.now())
-                            .build()
-            );
+    @CacheEvict(value = "agreedMembersCache", allEntries = true)
+    public Long saveMarketingConsent(Member member, Boolean isAgreed) {
+        marketingConsentRepository.save(
+                MarketingConsent.builder()
+                        .member(member)
+                        .isAgreed(isAgreed)
+                        .date(LocalDate.now())
+                        .build()
+        );
+        return member.getId();
     }
+
 
     @Override
     public void saveSystemConsent(Member member, Boolean isAgreed) {

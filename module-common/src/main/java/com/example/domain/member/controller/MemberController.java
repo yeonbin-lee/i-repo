@@ -83,7 +83,7 @@ public class MemberController {
      * 마케팅 수신 동의 변경 API
      */
     @PostMapping("/consent/marketing")
-    public ResponseEntity<?> changeMarketingConsent(@RequestHeader("Authorization") String accessToken, ConsentRequest request) {
+    public ResponseEntity<?> changeMarketingConsent(@RequestHeader("Authorization") String accessToken, @RequestBody ConsentRequest request) {
         Member member = memberService.findMemberById(memberService.findMemberIdByAccessToken(accessToken));
         consentService.saveMarketingConsent(member, request.getIsAgreed());
         return ResponseEntity.status(HttpStatus.OK).body("Marketing Consent Changed Successfully!");
@@ -94,7 +94,7 @@ public class MemberController {
      * 시스템 수신 동의 변경 API
      */
     @PostMapping("/consent/system")
-    public ResponseEntity<?> changeSystemConsent(@RequestHeader("Authorization") String accessToken, ConsentRequest request) {
+    public ResponseEntity<?> changeSystemConsent(@RequestHeader("Authorization") String accessToken, @RequestBody ConsentRequest request) {
         Member member = memberService.findMemberById(memberService.findMemberIdByAccessToken(accessToken));
         consentService.saveSystemConsent(member, request.getIsAgreed());
         return ResponseEntity.status(HttpStatus.OK).body("System Consent Changed Successfully!");

@@ -9,6 +9,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
+import static jakarta.persistence.FetchType.LAZY;
+
 @NoArgsConstructor
 @Getter
 @Entity
@@ -20,15 +22,14 @@ public class MarketingConsent {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @JsonIgnore
-    @ManyToOne
+    @JsonIgnore
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
     @Column(name = "is_agreed", nullable = false)
     private Boolean isAgreed; // 동의 여부를 나타내는 필드
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Column(name = "date")
     private LocalDate date;
 
     @Builder

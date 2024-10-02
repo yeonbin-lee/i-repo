@@ -32,6 +32,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -117,7 +118,6 @@ public class AuthServiceImpl implements AuthService {
         if(memberService.existByNickname(request.getNickname())){
             throw new DataIntegrityViolationException("중복되는 닉네임입니다.");
         }
-
         // 필수 약관 ID 목록
         List<Long> requiredTermsIds = List.of(1L, 2L, 3L);
 
@@ -147,8 +147,10 @@ public class AuthServiceImpl implements AuthService {
         // 기본 프로필 등록
         profileService.registerMainProfile(member);
 
+
         // SAVE MEMBER ENTITY
         memberService.saveMember(member);
+
 
         // 동의한 필수 약관 정보 저장
         for (Long termsId : agreedTermsIds) {
@@ -163,8 +165,12 @@ public class AuthServiceImpl implements AuthService {
                             .build());
         }
 
+
         // 선택 약관 정보 저장 - 마케팅
         consentService.saveMarketingConsent(member, request.getMarketingConsent());
+
+        System.out.println("555");
+
 
         // 선택 약관 정보 저장 - 시스템
         consentService.saveSystemConsent(member, request.getSystemConsent());
@@ -239,7 +245,6 @@ public class AuthServiceImpl implements AuthService {
             throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
         }
 
-        System.out.println("개빡치네" + request.getFcmToken());
         // FCM Token 갱신
         fcmService.updateFCMToken(member, request.getFcmToken());
 
@@ -268,6 +273,8 @@ public class AuthServiceImpl implements AuthService {
 
         return loginResponse;
     }
+
+
 
     /** [일반] 어드민 로그인 API */
     @Transactional
