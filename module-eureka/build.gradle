@@ -8,8 +8,8 @@ repositories {
     mavenCentral()
 }
 
-bootJar.enabled = false
-jar.enabled = true
+//bootJar.enabled = false
+//jar.enabled = true
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
@@ -23,6 +23,13 @@ java {
 
 ext {
     set('springCloudVersion', "2023.0.3")
+    set('commonsLangVersion', '3.12.0')
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }
 
 dependencies {
@@ -31,12 +38,6 @@ dependencies {
     implementation 'de.codecentric:spring-boot-admin-starter-server:3.2.2'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-}
-
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-    }
 }
 
 tasks.named('test') {

@@ -18,7 +18,7 @@ public class ConsentController {
 
     @GetMapping("/search/all")
     public ResponseEntity<?> sendNotificationToAll(){
-        return ResponseEntity.status(HttpStatus.OK).body(consentService.findAllAgreedMember());
+        return ResponseEntity.status(HttpStatus.OK).body(consentService.findAllMarketingAgreedMember());
     }
 
 

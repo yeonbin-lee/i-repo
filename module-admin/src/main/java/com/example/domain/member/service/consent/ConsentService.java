@@ -7,5 +7,7 @@ import java.util.List;
 
 public interface ConsentService {
 
-    public List<Long> findAllAgreedMember();
+    public List<Long> findAllMarketingAgreedMember();
+
+    public boolean checkAgreedMember(Long memberId);
 }

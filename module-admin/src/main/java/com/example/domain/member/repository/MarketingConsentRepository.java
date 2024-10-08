@@ -14,4 +14,6 @@ public interface MarketingConsentRepository extends JpaRepository<MarketingConse
             "  SELECT MAX(mc2.date) FROM MarketingConsent mc2 " +
             "  WHERE mc2.member = mc1.member)")
     List<Long> findLatestAgreedMembers();
+
+    boolean existsByMemberId(Long memberId);
 }
